@@ -1,0 +1,91 @@
+/* ==========================================================================
+   NEU WebPath LMS - Chuẩn Thiết kế Responsive Đa Thiết bị (Mobile, iPad, Laptop)
+   Tham chiếu thông số chuẩn W3C, Apple HIG & StatCounter Global Viewports:
+   1. Điện thoại (Mobile):         320px  - 767px   (Phổ biến: 360x800, 390x844, 414x896)
+   2. Máy tính bảng (iPad/Tablet): 768px  - 1023px  (iPad Mini/Air: 768x1024, iPad Pro 11": 834x1194)
+   3. Laptop & Desktop:            1024px - 1920px+ (Phổ biến: 1366x768, 1440x900, 1536x864, 1920x1080)
+   ========================================================================== */
+
+:root {
+    --touch-target-min: 44px; /* Chuẩn Apple HIG cho nút bấm cảm ứng trên Mobile & iPad */
+}
+
+/* Đảm bảo không tràn ngang trên mọi thiết bị di động */
+html, body {
+    max-width: 100vw;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+}
+
+/* Cỡ chữ và bảng tự động cuộn ngang mượt mà trên màn hình nhỏ */
+.prose pre, .prose table {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* ==========================================================================
+   1. ĐIỆN THOẠI (MOBILE: < 768px)
+   ========================================================================== */
+@media screen and (max-width: 767px) {
+    .touch-btn {
+        min-height: var(--touch-target-min);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    /* Chiều cao khung Cây kỹ năng DAG tối ưu cho màn hình dọc điện thoại */
+    #cy-dag-wrapper {
+        height: 390px !important;
+    }
+
+    /* Phòng Lab IDE trên Mobile chuyển sang chế độ cuộn linh hoạt hoặc chuyển Tab */
+    .workspace-shell {
+        height: auto !important;
+        min-height: calc(100vh - 4rem);
+    }
+
+    #monaco-editor-container {
+        min-height: 340px !important;
+        height: 360px !important;
+    }
+}
+
+/* ==========================================================================
+   2. IPAD & MÁY TÍNH BẢNG (TABLET PORTRAIT & LANDSCAPE: 768px - 1023px)
+   ========================================================================== */
+@media screen and (min-width: 768px) and (max-width: 1023px) {
+    #cy-dag-wrapper {
+        height: 470px !important;
+    }
+
+    .workspace-shell {
+        height: auto !important;
+        min-height: calc(100vh - 4rem);
+    }
+
+    #monaco-editor-container {
+        min-height: 400px !important;
+        height: 420px !important;
+    }
+}
+
+/* ==========================================================================
+   3. LAPTOP & DESKTOP (>= 1024px)
+   ========================================================================== */
+@media screen and (min-width: 1024px) {
+    #cy-dag-wrapper {
+        height: 560px !important;
+    }
+
+    .workspace-shell {
+        height: calc(100vh - 4rem) !important;
+        overflow: hidden;
+    }
+
+    /* Hiển thị đầy đủ tất cả các pane trên Laptop bất kể tab mobile nào đang bật */
+    .workspace-pane {
+        display: flex !important;
+    }
+}

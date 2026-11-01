@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+{% block title %}Thành tích, Huy hiệu & Sổ cái XP (Module M16) - NEU WebPath{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <!-- Sub-Navigation M16 -->
+    <div class="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <span class="px-2.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold uppercase">
+                Module M16 • Huy hiệu & Sổ cái XP
+            </span>
+            <h1 class="text-2xl font-extrabold text-[#1F1F1F] mt-1">
+                Bộ Sưu Tập Huy Hiệu & Lịch Sử Điểm Kinh Nghiệm
+            </h1>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 text-xs font-bold">
+            <a href="{{ url_for('m16.index') }}" class="px-3.5 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50">
+                <i class="fa-solid fa-chart-pie mr-1.5"></i>Tổng quan
+            </a>
+            <a href="{{ url_for('m16.progress') }}" class="px-3.5 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50">
+                <i class="fa-solid fa-bars-progress mr-1.5"></i>Tiến độ
+            </a>
+            <a href="{{ url_for('m16.achievements') }}" class="px-3.5 py-2 rounded-lg bg-[#0056D2] text-white">
+                <i class="fa-solid fa-medal mr-1.5"></i>Huy hiệu & XP
+            </a>
+            <a href="{{ url_for('m16.leaderboard') }}" class="px-3.5 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50">
+                <i class="fa-solid fa-trophy mr-1.5 text-amber-500"></i>Bảng xếp hạng
+            </a>
+        </div>
+    </div>
+
+    <!-- Danh sách Huy hiệu -->
+    <section class="space-y-4">
+        <h2 class="text-lg font-extrabold text-gray-900">Tất cả Huy hiệu Hệ thống ({{ user_badge_map|length }}/{{ all_badges|length }} đã mở khóa)</h2>
+        <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {% for b in all_badges %}
+                {% set earned = b.id in user_badge_map %}
+                <div class="rounded-xl border bg-white p-5 shadow-sm flex flex-col justify-between transition {% if earned %}border-amber-300 ring-1 ring-amber-200{% else %}border-gray-200 opacity-65{% endif %}">
+                    <div>
+                        <div class="flex items-center justify-between">
+                            <div class="w-11 h-11 rounded-full flex items-center justify-center text-lg {% if earned %}bg-amber-100 text-amber-600{% else %}bg-gray-100 text-gray-400{% endif %}">
+                                <i class="fa-solid {{ b.icon }}"></i>
+                            </div>
+                            <span class="px-2.5 py-0.5 rounded-full text-[11px] font-bold {% if earned %}bg-emerald-50 text-[#0E8043] border border-emerald-200{% else %}bg-gray-100 text-gray-500{% endif %}">
+                                {{ 'Đã đạt' if earned else 'Chưa đạt' }}
+                            </span>
+                        </div>
+                        <h3 class="mt-3 font-extrabold text-gray-900 text-sm">{{ b.name }}</h3>
+                        <p class="mt-1 text-xs text-gray-600">{{ b.description }}</p>
+                    </div>
+                    <div class="mt-4 pt-3 border-t border-gray-100 text-[11px] font-semibold text-gray-500">
+                        {% if b.required_xp > 0 and b.required_streak > 0 %}
+                            Điều kiện: {{ b.required_xp }} XP & {{ b.required_streak }} ngày Streak
+                        {% elif b.required_xp > 0 %}
+                            Điều kiện mở khóa: Đạt {{ b.required_xp }} XP
+                        {% elif b.required_streak > 0 %}
+                            Điều kiện mở khóa: {{ b.required_streak }} ngày Streak liên tiếp
+                        {% else %}
+                            Điều kiện: Hoàn thành nhiệm vụ mốc lộ trình
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- Sổ cái Lịch sử XP (XP Ledger) -->
+    <section class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+            <div>
+                <h2 class="text-base font-extrabold text-gray-900">Sổ Cái Điểm Kinh Nghiệm (XP Ledger)</h2>
+                <p class="text-xs text-gray-500">Mỗi sự kiện học tập có mã định danh <code>event_key</code> duy nhất để chống cộng điểm trùng lặp.</p>
+            </div>
+            <span class="text-sm font-extrabold text-[#0056D2]">Tổng tích lũy: {{ current_user.total_xp }} XP</span>
+        </div>
+
+        {% if xp_events %}
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-xs">
+                <thead class="bg-gray-50 text-gray-500 uppercase">
+                    <tr>
+                        <th class="p-3">#</th>
+                        <th class="p-3">Hoạt động / Lý do cộng điểm</th>
+                        <th class="p-3">Mã sự kiện (Event Key)</th>
+                        <th class="p-3">Thời gian</th>
+                        <th class="p-3 text-right">Điểm thưởng</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    {% for ev in xp_events %}
+                    <tr>
+                        <td class="p-3 font-bold text-gray-500">{{ loop.index }}</td>
+                        <td class="p-3 font-bold text-gray-900">{{ ev.reason }}</td>
+                        <td class="p-3 font-mono text-gray-500">{{ ev.event_key }}</td>
+                        <td class="p-3 text-gray-500">{{ ev.created_at.strftime('%d/%m/%Y %H:%M') if ev.created_at else '' }}</td>
+                        <td class="p-3 text-right font-extrabold text-[#0E8043]">+{{ ev.xp }} XP</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-sm text-gray-500">Chưa có giao dịch XP nào được ghi nhận.</p>
+        {% endif %}
+    </section>
+</div>
+{% endblock %}

@@ -1,0 +1,163 @@
+{% extends "base.html" %}
+{% block title %}Tổng quan Năng lực Số & Gamification (Module M16) - NEU WebPath{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <!-- Sub-Navigation M16 -->
+    <div class="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <span class="px-2.5 py-0.5 rounded bg-[#F0F6FF] text-[#0056D2] text-xs font-bold uppercase">
+                Module M16 • Đào tạo Năng lực Số & Gamification
+            </span>
+            <h1 class="text-2xl font-extrabold text-[#1F1F1F] mt-1">
+                Tổng Quan Học Tập, Streak & Gợi Ý Cá Nhân Hóa
+            </h1>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 text-xs font-bold">
+            <a href="{{ url_for('m16.index') }}" class="px-3.5 py-2 rounded-lg bg-[#0056D2] text-white">
+                <i class="fa-solid fa-chart-pie mr-1.5"></i>Tổng quan
+            </a>
+            <a href="{{ url_for('m16.progress') }}" class="px-3.5 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50">
+                <i class="fa-solid fa-bars-progress mr-1.5"></i>Tiến độ
+            </a>
+            <a href="{{ url_for('m16.achievements') }}" class="px-3.5 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50">
+                <i class="fa-solid fa-medal mr-1.5 text-amber-500"></i>Huy hiệu & XP
+            </a>
+            <a href="{{ url_for('m16.leaderboard') }}" class="px-3.5 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50">
+                <i class="fa-solid fa-trophy mr-1.5 text-amber-500"></i>Bảng xếp hạng
+            </a>
+            {% if current_user.role == 'admin' %}
+            <a href="{{ url_for('m16.admin_questions') }}" class="px-3.5 py-2 rounded-lg border border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100">
+                <i class="fa-solid fa-database mr-1.5"></i>Ngân hàng câu hỏi
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- 4 KPI Cards -->
+    <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+            <p class="text-xs font-bold uppercase text-gray-500">Tổng điểm kinh nghiệm (XP)</p>
+            <p class="mt-2 text-3xl font-extrabold text-[#0056D2]">{{ data.total_xp }} <span class="text-sm font-bold">XP</span></p>
+            <p class="mt-1 text-xs text-gray-500">Ghi nhận qua sổ cái chống cộng trùng</p>
+        </div>
+        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+            <p class="text-xs font-bold uppercase text-gray-500">Chuỗi ngày học hiện tại</p>
+            <p class="mt-2 text-3xl font-extrabold text-amber-600"><i class="fa-solid fa-fire mr-1.5"></i>{{ data.streak.current_streak }} ngày</p>
+            <p class="mt-1 text-xs text-gray-500">Cập nhật: {{ data.streak.last_study_date or 'Hôm nay' }}</p>
+        </div>
+        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+            <p class="text-xs font-bold uppercase text-gray-500">Streak kỷ lục dài nhất</p>
+            <p class="mt-2 text-3xl font-extrabold text-indigo-700">{{ data.streak.longest_streak }} ngày</p>
+            <p class="mt-1 text-xs text-gray-500">Duy trì học đều đặn mỗi ngày</p>
+        </div>
+        <div class="rounded-xl border border-gray-200 bg-white p-5 shadow-sm">
+            <p class="text-xs font-bold uppercase text-gray-500">Node Kỹ năng Đã Mastered</p>
+            <p class="mt-2 text-3xl font-extrabold text-[#0E8043]">{{ data.progress.completed }}/{{ data.progress.total }}</p>
+            <p class="mt-1 text-xs text-gray-500">Bài giảng đã đọc: {{ data.progress.lessons_completed }}/{{ data.progress.lessons_total }}</p>
+        </div>
+    </div>
+
+    <div class="grid gap-6 lg:grid-cols-12">
+        <!-- Left 7 Cols: Trình độ Đầu vào & Gợi ý Học tập Thông minh -->
+        <div class="lg:col-span-7 space-y-6">
+            <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-base font-bold text-[#1F1F1F]">
+                        <i class="fa-solid fa-compass text-[#0056D2] mr-2"></i>Đánh giá Trình độ Hiện tại
+                    </h2>
+                    <a href="{{ url_for('main.placement_test') }}" class="px-3.5 py-1.5 rounded-lg bg-[#0056D2] hover:bg-[#00419E] text-white text-xs font-bold transition">
+                        Làm bài kiểm tra đầu vào
+                    </a>
+                </div>
+                {% if data.latest_test %}
+                <div class="p-4 rounded-lg bg-[#F0F6FF] border border-blue-200 space-y-1.5">
+                    <div class="flex items-center justify-between">
+                        <span class="text-lg font-extrabold text-[#0056D2]">Trình độ: {{ data.latest_test.level }} ({{ data.latest_test.score }}/100 điểm)</span>
+                        <span class="text-xs text-gray-500">{{ data.latest_test.completed_at }}</span>
+                    </div>
+                    <p class="text-xs text-gray-700">Số câu đúng: <strong>{{ data.latest_test.correct_count }}/{{ data.latest_test.total_questions }}</strong> • Lộ trình khuyến nghị: <strong>{{ data.latest_test.recommended_path }}</strong></p>
+                </div>
+                {% else %}
+                <div class="p-4 rounded-lg bg-gray-50 border border-dashed border-gray-300 text-xs text-gray-600">
+                    Bạn chưa có bản ghi kiểm tra đầu vào trong lịch sử. Hãy thực hiện bài kiểm tra để hệ thống xếp trình độ và cộng ngay <strong>+20 XP</strong>!
+                </div>
+                {% endif %}
+            </section>
+
+            <!-- Gợi ý Học tập Cá nhân hóa (M16 Rule-based Recommendations) -->
+            <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm space-y-4">
+                <div class="flex items-center justify-between">
+                    <h2 class="text-base font-bold text-[#1F1F1F]">
+                        <i class="fa-solid fa-wand-magic-sparkles text-amber-500 mr-2"></i>Gợi ý Bước Học Tiếp Theo Dành Cho Bạn
+                    </h2>
+                    <span class="text-[11px] font-semibold text-gray-400">Adaptive Rule Engine</span>
+                </div>
+                <div class="space-y-3">
+                    {% for rec in recommendations %}
+                    <div class="p-4 rounded-lg bg-[#F5F7F8] border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div>
+                            <p class="text-sm font-bold text-[#1F1F1F]">{{ rec.title }}</p>
+                            <p class="text-xs text-gray-600 mt-0.5">{{ rec.reason }}</p>
+                        </div>
+                        <a href="{{ rec.action_url }}" class="shrink-0 px-3.5 py-2 rounded bg-white border border-[#0056D2] text-[#0056D2] hover:bg-[#F0F6FF] text-xs font-bold transition text-center">
+                            {{ rec.action_label }} &rarr;
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+
+        <!-- Right 5 Cols: Huy hiệu Đã đạt & Lịch sử nhận XP gần đây -->
+        <div class="lg:col-span-5 space-y-6">
+            <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-base font-bold text-[#1F1F1F]">
+                        <i class="fa-solid fa-medal text-amber-500 mr-2"></i>Huy hiệu Đã Đạt ({{ data.badges|length }})
+                    </h2>
+                    <a href="{{ url_for('m16.achievements') }}" class="text-xs font-bold text-[#0056D2] hover:underline">Xem tất cả &rarr;</a>
+                </div>
+                {% if data.badges %}
+                <div class="grid grid-cols-2 gap-3">
+                    {% for b in data.badges %}
+                    <div class="rounded-lg bg-amber-50/60 border border-amber-200 p-3 text-center">
+                        <div class="w-8 h-8 mx-auto rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-sm mb-1">
+                            <i class="fa-solid {{ b.icon }}"></i>
+                        </div>
+                        <p class="text-xs font-bold text-gray-900">{{ b.name }}</p>
+                        <p class="text-[10px] text-gray-500 mt-0.5">{{ b.description }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-xs text-gray-500">Chưa có huy hiệu. Hãy bắt đầu học nhé!</p>
+                {% endif %}
+            </section>
+
+            <section class="rounded-xl border border-gray-200 bg-white p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <h2 class="text-base font-bold text-[#1F1F1F]">
+                        <i class="fa-solid fa-clock-rotate-left text-[#0056D2] mr-2"></i>Nhật ký Tích lũy XP Gần Đây
+                    </h2>
+                </div>
+                {% if data.xp_history %}
+                <div class="divide-y divide-gray-100 text-xs max-h-64 overflow-y-auto">
+                    {% for item in data.xp_history %}
+                    <div class="py-2.5 flex items-center justify-between gap-2">
+                        <div>
+                            <p class="font-semibold text-gray-800">{{ item.reason }}</p>
+                            <p class="text-[10px] text-gray-400">{{ item.created_at }} • Key: {{ item.event_key }}</p>
+                        </div>
+                        <span class="px-2 py-0.5 rounded bg-emerald-50 text-[#0E8043] font-extrabold shrink-0">+{{ item.xp }} XP</span>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-xs text-gray-500">Chưa có lịch sử nhận XP.</p>
+                {% endif %}
+            </section>
+        </div>
+    </div>
+</div>
+{% endblock %}

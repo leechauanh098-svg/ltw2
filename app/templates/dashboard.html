@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+{% block title %}Lộ trình Học tập CNTT1165 & CNTT1188 - ĐH Kinh tế Quốc dân (NEU){% endblock %}
+
+{% block content %}
+<!-- Coursera Welcome Banner -->
+<div class="bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="text-xs font-bold uppercase tracking-wider text-[#0056D2]">Khoa CNTT - NEU • {{ current_user.placement_level }}</span>
+                <a href="{{ url_for('main.placement_test') }}" class="text-xs font-bold text-[#0E8043] bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded hover:bg-emerald-100">
+                    <i class="fa-solid fa-compass mr-1"></i>Làm lại Test đầu vào
+                </a>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1F1F1F] mt-1">
+                Chào mừng trở lại, {{ current_user.username }}!
+            </h1>
+            <p class="text-sm text-gray-600 mt-1">
+                Phương pháp học chuẩn Đề cương NEU (<strong>CNTT1165 & CNTT1188</strong>): <strong>Bước 1 Đọc Bài giảng Lý thuyết</strong> $\rightarrow$ <strong>Bước 2 Thực hành viết code củng cố ngay trên Web</strong>.
+            </p>
+        </div>
+
+        <!-- Weekly Streak & XP Summary Pill -->
+        <div class="flex items-center gap-4 bg-[#F5F7F8] border border-gray-200 rounded-lg px-5 py-3.5 shrink-0">
+            <div class="text-center pr-4 border-r border-gray-200">
+                <span class="block text-[11px] font-bold uppercase text-gray-500">Điểm XP</span>
+                <span class="text-xl font-extrabold text-[#0056D2]">{{ current_user.total_xp }}</span>
+            </div>
+            <div class="text-center pr-4 border-r border-gray-200">
+                <span class="block text-[11px] font-bold uppercase text-gray-500">Node Đã Đạt</span>
+                <span class="text-xl font-extrabold text-[#0E8043]">{{ mastered_skills_count }}/{{ skills|length }}</span>
+            </div>
+            <div class="text-center">
+                <span class="block text-[11px] font-bold uppercase text-gray-500">Bài giảng Đã đọc</span>
+                <span class="text-xl font-extrabold text-amber-600">{{ completed_lesson_ids|length }}/6</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Main Coursera Content Grid -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid lg:grid-cols-12 gap-8">
+        <!-- Left 8 Columns: Lộ trình Đọc Bài giảng -> Thực hành Củng cố theo từng Chương của CNTT1165 & CNTT1188 -->
+        <div class="lg:col-span-8 space-y-6">
+            <!-- Danh sách 2 Học phần NEU (CNTT1165 & CNTT1188): Mỗi chương gắn liền [Bước 1: Đọc Bài giảng] -> [Bước 2: Thực hành Củng cố] -->
+            {% for course in courses %}
+            <div class="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm">
+                <div class="px-6 py-5 border-b border-gray-200 bg-[#F0F6FF]/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div>
+                        <span class="text-xs font-bold uppercase tracking-wider text-[#0056D2]">
+                            Đề cương Chính thức • Khoa Công nghệ Thông tin (NEU)
+                        </span>
+                        <h2 class="text-lg sm:text-xl font-extrabold text-[#1F1F1F] mt-0.5">{{ course.title }}</h2>
+                        <p class="text-xs text-gray-600 mt-0.5">{{ course.description }}</p>
+                    </div>
+                    <a href="{{ url_for('skills.tree_view') }}" class="shrink-0 inline-flex items-center px-3.5 py-2 rounded border border-[#0056D2] bg-white text-[#0056D2] hover:bg-[#F0F6FF] text-xs font-bold transition">
+                        <i class="fa-solid fa-sitemap mr-1.5"></i>Sơ đồ Cây Kỹ năng
+                    </a>
+                </div>
+
+                <div class="divide-y divide-gray-200">
+                    {% for lesson in course.lessons %}
+                        {% set is_read = lesson.id in completed_lesson_ids %}
+                        {% set ex = lesson.exercises.first() %}
+                        {% set is_solved = ex and (ex.id in ac_exercise_ids) %}
+                        {% set sk_prog = skill_progress.get(ex.skill_id) if ex else None %}
+                        {% set sk_status = sk_prog.status if sk_prog else 'unlocked' %}
+
+                        <div class="p-5 sm:p-6 hover:bg-gray-50/70 transition space-y-4">
+                            <!-- Tiêu đề Chương & Trạng thái Node Kỹ năng -->
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                                <div class="flex items-center gap-2">
+                                    {% if ex and ex.skill %}
+                                        <span class="px-2.5 py-0.5 rounded text-[11px] font-bold uppercase
+                                            {% if sk_status == 'mastered' %}bg-emerald-50 text-[#0E8043] border border-emerald-200
+                                            {% elif sk_status in ('unlocked', 'in_progress') %}bg-[#F0F6FF] text-[#0056D2] border border-blue-200
+                                            {% else %}bg-gray-100 text-gray-600{% endif %}">
+                                            {{ ex.skill.name }} • {{ sk_status | upper }}
+                                        </span>
+                                    {% endif %}
+                                </div>
+                                <div class="text-xs font-semibold text-gray-500">
+                                    Tiến độ chương:
+                                    <span class="{% if is_read %}text-[#0E8043] font-bold{% endif %}">1. Lý thuyết ({{ 'Đã đọc' if is_read else 'Chưa đọc' }})</span>
+                                    <span class="mx-1">&rarr;</span>
+                                    <span class="{% if is_solved %}text-[#0E8043] font-bold{% endif %}">2. Thực hành ({{ 'Đã AC' if is_solved else 'Chưa làm' }})</span>
+                                </div>
+                            </div>
+
+                            <!-- Khung 2 Bước: [Bước 1: Đọc Bài giảng] -> [Bước 2: Thực hành Củng cố] -->
+                            <div class="grid sm:grid-cols-2 gap-3.5">
+                                <!-- Bước 1: Đọc Bài giảng Lý thuyết -->
+                                <div class="p-4 rounded-lg border flex flex-col justify-between
+                                    {% if is_read %}bg-emerald-50/30 border-emerald-200{% else %}bg-white border-gray-200{% endif %}">
+                                    <div>
+                                        <div class="flex items-center justify-between text-xs mb-1.5">
+                                            <span class="font-bold uppercase text-[#0056D2]">
+                                                <i class="fa-solid fa-book-open mr-1"></i>Bước 1: Đọc Bài Giảng
+                                            </span>
+                                            {% if is_read %}
+                                                <span class="text-[#0E8043] font-bold"><i class="fa-solid fa-circle-check mr-1"></i>Đã đọc</span>
+                                            {% else %}
+                                                <span class="text-amber-600 font-bold">+{{ lesson.xp_reward }} XP</span>
+                                            {% endif %}
+                                        </div>
+                                        <h3 class="text-sm font-bold text-[#1F1F1F]">{{ lesson.title }}</h3>
+                                    </div>
+                                    <div class="mt-3 pt-2 border-t border-gray-100">
+                                        <a href="{{ url_for('main.lesson_detail', slug=lesson.slug) }}" class="inline-flex items-center text-xs font-bold text-[#0056D2] hover:underline">
+                                            <span>{{ 'Đọc lại bài giảng lý thuyết' if is_read else 'Đọc bài giảng trước khi làm bài' }}</span>
+                                            <i class="fa-solid fa-arrow-right ml-1.5"></i>
+                                        </a>
+                                    </div>
+                                </div>
+
+                                <!-- Bước 2: Làm Bài tập Thực hành củng cố ngay -->
+                                {% if ex %}
+                                <div class="p-4 rounded-lg border flex flex-col justify-between
+                                    {% if is_solved %}bg-emerald-50/40 border-emerald-300{% else %}bg-[#F5F7F8] border-gray-200{% endif %}">
+                                    <div>
+                                        <div class="flex items-center justify-between text-xs mb-1.5">
+                                            <span class="font-bold uppercase text-[#0E8043]">
+                                                <i class="fa-solid fa-laptop-code mr-1"></i>Bước 2: Thực Hành Củng Cố
+                                            </span>
+                                            {% if is_solved %}
+                                                <span class="text-[#0E8043] font-bold"><i class="fa-solid fa-check-double mr-1"></i>Đã giải (AC)</span>
+                                            {% else %}
+                                                <span class="text-[#0E8043] font-bold">+{{ ex.xp_reward }} XP</span>
+                                            {% endif %}
+                                        </div>
+                                        <h3 class="text-sm font-bold text-[#1F1F1F]">{{ ex.title }}</h3>
+                                        <p class="text-[11px] text-gray-500 mt-0.5">{{ ex.scaffold_level }}</p>
+                                    </div>
+                                    <div class="mt-3 pt-2 border-t border-gray-200/70">
+                                        <a href="{{ url_for('judge.workspace', slug=ex.slug) }}" class="w-full py-2 px-3 rounded bg-[#0056D2] hover:bg-[#00419E] text-white text-xs font-bold transition inline-flex items-center justify-center">
+                                            <i class="fa-solid fa-code mr-1.5"></i>{{ 'Xem lại bài thực hành' if is_solved else 'Làm bài thực hành củng cố ngay' }}
+                                        </a>
+                                    </div>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <!-- Right 4 Columns: Tìm bạn học cùng lộ trình (Study Buddies) & Huy hiệu (Badges) -->
+        <div class="lg:col-span-4 space-y-6">
+            <!-- Tìm bạn học cùng lộ trình tại NEU -->
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="flex items-center justify-between pb-3 border-b border-gray-200">
+                    <h3 class="text-base font-bold text-[#1F1F1F]">
+                        <i class="fa-solid fa-user-group text-[#0056D2] mr-2"></i>Bạn Học Cùng Lộ Trình NEU
+                    </h3>
+                    <a href="{{ url_for('buddy.index') }}" class="px-2.5 py-1 rounded bg-[#F0F6FF] text-[#0056D2] hover:bg-blue-100 text-[11px] font-bold transition">
+                        Ghép cặp & Chat &rarr;
+                    </a>
+                </div>
+                <p class="text-xs text-gray-600 mt-2 mb-3">
+                    Các sinh viên NEU đang học cùng học phần <strong>CNTT1165 & CNTT1188</strong> với bạn:
+                </p>
+
+                <div class="space-y-3">
+                    {% for buddy in study_buddies %}
+                    <div class="p-3 rounded-lg bg-[#F5F7F8] border border-gray-200 flex items-center justify-between text-xs">
+                        <div class="flex items-center space-x-2.5">
+                            <div class="w-8 h-8 rounded-full bg-[#0056D2] text-white font-bold flex items-center justify-center uppercase">
+                                {{ buddy.username[:2] }}
+                            </div>
+                            <div>
+                                <p class="font-bold text-[#1F1F1F]">{{ buddy.username }}</p>
+                                <p class="text-[11px] text-gray-500">{{ buddy.placement_level }}</p>
+                            </div>
+                        </div>
+                        <div class="text-right shrink-0 ml-2">
+                            <span class="font-bold text-[#0056D2] block">{{ buddy.total_xp }} XP</span>
+                            <span class="text-[11px] text-amber-600 font-semibold"><i class="fa-solid fa-fire mr-0.5"></i>{{ buddy.current_streak }} ngày</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Huy hiệu đạt được (Badges) -->
+            <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+                <div class="flex items-center justify-between pb-3 border-b border-gray-200">
+                    <h3 class="text-base font-bold text-[#1F1F1F]">
+                        <i class="fa-solid fa-medal text-amber-500 mr-2"></i>Bộ Sưu Tập Huy Hiệu
+                    </h3>
+                    <a href="{{ url_for('m16.achievements') }}" class="text-xs font-bold text-[#0056D2] hover:underline">
+                        Xem tất cả & XP &rarr;
+                    </a>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mt-3">
+                    {% for b in all_badges %}
+                        {% set owned = b.id in owned_badge_ids %}
+                        <div class="p-3 rounded-lg border text-center transition
+                            {% if owned %}bg-amber-50/50 border-amber-300{% else %}bg-gray-50 border-gray-200 opacity-50{% endif %}">
+                            <div class="w-9 h-9 mx-auto rounded-full flex items-center justify-center text-base mb-1.5
+                                {% if owned %}bg-amber-100 text-amber-600{% else %}bg-gray-200 text-gray-400{% endif %}">
+                                <i class="fa-solid {{ b.icon }}"></i>
+                            </div>
+                            <p class="text-xs font-bold text-[#1F1F1F]">{{ b.name }}</p>
+                            <p class="text-[10px] text-gray-500 mt-0.5">{{ b.description }}</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

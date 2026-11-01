@@ -1,0 +1,287 @@
+{% extends "base.html" %}
+{% block title %}Cây Kỹ năng Chuyên ngành (DAG) - NEU WebPath LMS{% endblock %}
+
+{% block content %}
+<!-- Coursera Subheader -->
+<div class="bg-white border-b border-gray-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+        <div>
+            <span class="text-xs font-bold uppercase tracking-wider text-[#0056D2]">NEU SkillTracks • Directed Acyclic Graph</span>
+            <h1 class="text-xl sm:text-2xl font-extrabold text-[#1F1F1F] mt-0.5">Bản đồ Cây Kỹ năng Lập trình Web</h1>
+            <p class="text-xs text-gray-600 mt-0.5">Chạm hoặc click vào bất kỳ Node kỹ năng nào trên sơ đồ để xem điều kiện tiên quyết và bài tập thực hành.</p>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2 text-[11px] sm:text-xs">
+            <span class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-300 text-[#0E8043] font-bold">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#0E8043]"></span>Mastered (Đã đạt)
+            </span>
+            <span class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#F0F6FF] border border-blue-300 text-[#0056D2] font-bold">
+                <span class="w-2.5 h-2.5 rounded-full bg-[#0056D2]"></span>Unlocked (Đang mở)
+            </span>
+            <span class="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-gray-100 border border-gray-300 text-gray-600 font-semibold">
+                <span class="w-2.5 h-2.5 rounded-full bg-gray-400"></span>Locked (Đang khóa)
+            </span>
+        </div>
+    </div>
+</div>
+
+<div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-5 sm:py-6">
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <!-- Left 8 Columns: Responsive DAG Canvas (390px on Mobile, 470px on iPad, 560px on Laptop) -->
+        <div id="cy-dag-wrapper" class="lg:col-span-8 bg-white border border-gray-200 rounded-lg relative overflow-hidden h-[390px] md:h-[470px] lg:h-[560px] shadow-sm"
+             style="background-image: radial-gradient(#CBD5E1 1px, transparent 1px); background-size: 20px 20px;">
+            <div id="cy-dag-canvas" class="w-full h-full"></div>
+
+            <!-- Nút điều khiển Cảm ứng (Touch Controls) cho Điện thoại & iPad -->
+            <div class="absolute top-3 right-3 flex items-center gap-1.5 bg-white/95 p-1.5 rounded-lg border border-gray-200 shadow-sm z-10">
+                <button type="button" onclick="zoomDag(1.2)" title="Phóng to" class="w-8 h-8 rounded hover:bg-gray-100 text-gray-700 font-bold text-sm flex items-center justify-center">
+                    <i class="fa-solid fa-plus"></i>
+                </button>
+                <button type="button" onclick="zoomDag(0.8)" title="Thu nhỏ" class="w-8 h-8 rounded hover:bg-gray-100 text-gray-700 font-bold text-sm flex items-center justify-center">
+                    <i class="fa-solid fa-minus"></i>
+                </button>
+                <button type="button" onclick="fitDag()" title="Căn giữa vừa màn hình" class="px-2.5 h-8 rounded hover:bg-[#F0F6FF] text-[#0056D2] font-bold text-xs flex items-center justify-center">
+                    <i class="fa-solid fa-expand mr-1"></i>Vừa khung
+                </button>
+            </div>
+
+            <div class="absolute bottom-2.5 left-2.5 right-2.5 sm:right-auto text-[11px] text-gray-600 bg-white/95 px-3 py-1.5 rounded border border-gray-200 shadow-sm">
+                <i class="fa-solid fa-hand-pointer mr-1 text-[#0056D2]"></i>Chạm vào từng Node kỹ năng để xem chi tiết bên dưới.
+            </div>
+        </div>
+
+        <!-- Right 4 Columns: Coursera Skill Details & Admin Cycle Checker -->
+        <div class="lg:col-span-4 space-y-6">
+            <div id="skill-detail-card" class="bg-white border border-gray-200 rounded-lg p-5 sm:p-6 shadow-sm">
+                <div class="text-center py-8 text-gray-500">
+                    <i class="fa-solid fa-sitemap text-3xl text-[#0056D2] mb-3"></i>
+                    <p class="text-sm font-bold text-[#1F1F1F]">Chọn một Kỹ năng trên Sơ đồ</p>
+                    <p class="text-xs mt-1">Chi tiết học phần, điều kiện tiên quyết và danh sách bài tập chấm điểm tự động sẽ hiển thị tại đây.</p>
+                </div>
+            </div>
+
+            {% if current_user.is_authenticated and current_user.is_admin_or_instructor %}
+            <div class="bg-white border-2 border-[#0056D2]/30 rounded-lg p-5 shadow-sm">
+                <span class="text-[11px] font-bold uppercase px-2 py-0.5 rounded bg-[#F0F6FF] text-[#0056D2]">
+                    Công cụ Giảng viên • Kiểm tra Chu trình DAG
+                </span>
+                <h3 class="text-sm font-bold text-[#1F1F1F] mt-2">Thêm Điều kiện Tiên quyết Mới</h3>
+                <p class="text-xs text-gray-600 mt-0.5 mb-4">Thuật toán BFS tự động ngăn chặn nếu cạnh thêm vào tạo ra vòng lặp phụ thuộc (Cycle).</p>
+
+                <form method="POST" action="{{ url_for('skills.add_prerequisite_edge') }}" class="space-y-3 text-xs">
+                    <div>
+                        <label class="block font-bold text-gray-700 mb-1">Kỹ năng Tiên quyết (Prerequisite):</label>
+                        <select name="prerequisite_id" class="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-900">
+                            {% for s in all_skills %}
+                                <option value="{{ s.id }}">{{ s.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block font-bold text-gray-700 mb-1">Kỹ năng Mở khóa Tiếp theo (Target Skill):</label>
+                        <select name="skill_id" class="w-full px-3 py-2 rounded border border-gray-300 bg-white text-gray-900">
+                            {% for s in all_skills %}
+                                <option value="{{ s.id }}">{{ s.name }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="w-full py-2.5 rounded bg-[#0056D2] hover:bg-[#00419E] font-bold text-white transition">
+                        Kiểm tra Chu trình & Lưu Cạnh DAG
+                    </button>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dagre/0.8.5/dagre.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/cytoscape-dagre@2.5.0/cytoscape-dagre.min.js"></script>
+
+<script>
+let cyInstance = null;
+
+function zoomDag(factor) {
+    if (cyInstance) {
+        cyInstance.zoom({
+            level: cyInstance.zoom() * factor,
+            renderedPosition: { x: cyInstance.width() / 2, y: cyInstance.height() / 2 }
+        });
+    }
+}
+
+function fitDag() {
+    if (cyInstance) {
+        cyInstance.fit(undefined, 32);
+    }
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    const res = await fetch('/skills/api/dag-graph');
+    const graphData = await res.json();
+
+    cyInstance = cytoscape({
+        container: document.getElementById('cy-dag-canvas'),
+        elements: [...graphData.nodes, ...graphData.edges],
+        layout: {
+            name: 'dagre',
+            rankDir: 'TB',
+            nodeSep: window.innerWidth < 768 ? 50 : 75,
+            rankSep: window.innerWidth < 768 ? 75 : 95,
+            padding: 32
+        },
+        style: [
+            {
+                selector: 'node',
+                style: {
+                    'label': 'data(name)',
+                    'text-valign': 'bottom',
+                    'text-margin-y': 8,
+                    'color': '#1F1F1F',
+                    'font-size': window.innerWidth < 768 ? '11px' : '12px',
+                    'font-weight': 'bold',
+                    'text-background-color': '#FFFFFF',
+                    'text-background-opacity': 0.9,
+                    'text-background-padding': '3px',
+                    'width': 50,
+                    'height': 50,
+                    'border-width': 3,
+                    'background-color': '#E2E8F0',
+                    'border-color': '#94A3B8'
+                }
+            },
+            {
+                selector: 'node[status = "mastered"]',
+                style: {
+                    'background-color': '#0E8043',
+                    'border-color': '#A7F3D0',
+                    'border-width': 4
+                }
+            },
+            {
+                selector: 'node[status = "unlocked"], node[status = "in_progress"]',
+                style: {
+                    'background-color': '#0056D2',
+                    'border-color': '#BFDBFE',
+                    'border-width': 4
+                }
+            },
+            {
+                selector: 'node[status = "locked"]',
+                style: {
+                    'background-color': '#CBD5E1',
+                    'border-color': '#94A3B8',
+                    'opacity': 0.75
+                }
+            },
+            {
+                selector: 'edge',
+                style: {
+                    'width': 2.5,
+                    'line-color': '#94A3B8',
+                    'target-arrow-color': '#94A3B8',
+                    'target-arrow-shape': 'triangle',
+                    'curve-style': 'bezier'
+                }
+            },
+            {
+                selector: 'edge[active = "true"]',
+                style: {
+                    'line-color': '#0E8043',
+                    'target-arrow-color': '#0E8043',
+                    'width': 3.5
+                }
+            }
+        ]
+    });
+
+    // Tự động căn chỉnh lại đồ thị khi xoay màn hình Điện thoại / iPad
+    window.addEventListener('resize', () => {
+        if (cyInstance) {
+            cyInstance.resize();
+            cyInstance.fit(undefined, 32);
+        }
+    });
+
+    async function loadSkillDetail(skillId, scrollOnMobile = false) {
+        const resp = await fetch(`/skills/api/node/${skillId}`);
+        const d = await resp.json();
+        const card = document.getElementById('skill-detail-card');
+
+        const badgeColor = d.status === 'mastered'
+            ? 'bg-emerald-50 text-[#0E8043] border-emerald-300'
+            : (d.status === 'locked' ? 'bg-gray-100 text-gray-600 border-gray-300' : 'bg-[#F0F6FF] text-[#0056D2] border-blue-200');
+
+        const prereqHtml = d.prerequisites.length
+            ? d.prerequisites.map(p => `<span class="px-2.5 py-1 rounded bg-gray-100 border border-gray-200 text-gray-700 text-xs font-semibold">${p}</span>`).join(' ')
+            : '<span class="text-xs font-bold text-[#0E8043]">Không yêu cầu (Node Nền tảng Tầng 1)</span>';
+
+        const exHtml = d.exercises.length
+            ? d.exercises.map(ex => `
+                <div class="p-3.5 rounded-lg border border-gray-200 bg-[#F5F7F8] space-y-2">
+                    ${ex.lesson_slug ? `
+                        <a href="/lessons/${ex.lesson_slug}" class="block p-2.5 rounded bg-white border border-blue-200 hover:border-[#0056D2] transition text-xs">
+                            <span class="font-bold uppercase text-[#0056D2] block text-[10px]"><i class="fa-solid fa-book-open mr-1"></i>Bước 1: Đọc Bài giảng Lý thuyết trước</span>
+                            <span class="font-bold text-gray-900 mt-0.5 block">${ex.lesson_title}</span>
+                        </a>
+                    ` : ''}
+                    <a href="/judge/workspace/${ex.slug}" class="block p-2.5 rounded bg-[#0056D2] hover:bg-[#00419E] text-white transition text-xs">
+                        <div class="flex items-center justify-between">
+                            <span class="font-bold uppercase text-[10px] text-blue-100"><i class="fa-solid fa-laptop-code mr-1"></i>Bước 2: Thực hành Củng cố ngay</span>
+                            <span class="font-bold text-amber-300">+${ex.xp_reward} XP</span>
+                        </div>
+                        <span class="font-bold block mt-0.5">${ex.title} &rarr;</span>
+                    </a>
+                </div>
+            `).join('')
+            : '<p class="text-xs text-gray-500">Chưa có bài tập lập trình cho kỹ năng này.</p>';
+
+        card.innerHTML = `
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold uppercase text-gray-500">Node Tầng ${d.tier}</span>
+                <span class="px-2.5 py-0.5 rounded border text-xs font-bold uppercase ${badgeColor}">${d.status}</span>
+            </div>
+            <h2 class="text-lg font-extrabold text-[#1F1F1F]">${d.name}</h2>
+            <p class="text-xs text-gray-600 mt-1.5 leading-relaxed">${d.description}</p>
+
+            <div class="mt-4 pt-4 border-t border-gray-200 space-y-2 text-xs">
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Bài tập chấm tự động đã đạt:</span>
+                    <strong class="text-gray-900">${d.completed_exercises} / ${d.required_exercises} bài AC</strong>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-gray-500">Điểm kinh nghiệm tích lũy:</span>
+                    <strong class="text-[#0056D2]">${d.earned_xp} / ${d.required_xp} XP</strong>
+                </div>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-gray-200">
+                <span class="block text-xs font-bold uppercase text-gray-500 mb-2">Điều kiện tiên quyết (Prerequisites):</span>
+                <div class="flex flex-wrap gap-1.5">${prereqHtml}</div>
+            </div>
+
+            <div class="mt-4 pt-4 border-t border-gray-200 space-y-2">
+                <span class="block text-xs font-bold uppercase text-gray-500 mb-2">Bài tập Hướng dẫn Từng bước:</span>
+                ${exHtml}
+            </div>
+        `;
+
+        if (scrollOnMobile && window.innerWidth < 1024) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+    }
+
+    cyInstance.on('tap', 'node', function(evt) {
+        const skillId = evt.target.data('skill_id');
+        loadSkillDetail(skillId, true);
+    });
+
+    if (graphData.nodes.length > 0) {
+        loadSkillDetail(graphData.nodes[0].data.skill_id, false);
+    }
+});
+</script>
+{% endblock %}

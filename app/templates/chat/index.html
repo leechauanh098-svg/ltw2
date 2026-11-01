@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+{% block title %}Chat - Phòng học{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8 grid lg:grid-cols-[260px_1fr] gap-6">
+  <aside class="space-y-4">
+    <div class="bg-white rounded-xl border border-gray-200 p-4">
+      <h2 class="font-bold text-gray-900 mb-3">Phòng của bạn</h2>
+      {% for room, title in rooms %}
+        <a href="{{ url_for('chat.index', room=room.id) }}"
+           class="block px-3 py-2 rounded text-sm {% if current and room.id == current.id %}bg-[#F0F6FF] text-[#0056D2] font-bold{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
+          <i class="fa-solid {% if room.type == 'group' %}fa-user-group{% else %}fa-user{% endif %} mr-1"></i>{{ title }}
+        </a>
+      {% else %}
+        <p class="text-sm text-gray-500">Chưa có phòng nào. Hãy ghép cặp ở trang Bạn học.</p>
+      {% endfor %}
+    </div>
+
+    <form method="POST" action="{{ url_for('chat.create_group') }}" class="bg-white rounded-xl border border-gray-200 p-4 space-y-2">
+      <h2 class="font-bold text-gray-900">Tạo nhóm học</h2>
+      <input name="name" maxlength="100" required placeholder="Tên nhóm" class="w-full border border-gray-300 rounded px-3 py-2 text-sm">
+      <div class="max-h-40 overflow-y-auto space-y-1">
+        {% for u in learners %}
+        <label class="flex items-center gap-2 text-sm">
+          <input type="checkbox" name="member_ids" value="{{ u.id }}"> {{ u.username }}
+        </label>
+        {% else %}
+        <p class="text-xs text-gray-500">Chưa có người học khác.</p>
+        {% endfor %}
+      </div>
+      <button class="w-full py-2 rounded bg-[#0056D2] hover:bg-[#00419E] text-white text-sm font-bold">Tạo nhóm</button>
+    </form>
+  </aside>
+
+  <main class="space-y-6">
+    {% if current %}
+    <section class="bg-white rounded-xl border border-gray-200 p-4">
+      <div class="flex items-center justify-between mb-3">
+        <h2 class="font-bold text-gray-900">{{ current_title }}</h2>
+        {% if other_id %}
+        <div class="flex gap-2">
+          <form method="POST" action="{{ url_for('safety.report') }}">
+            <input type="hidden" name="target_id" value="{{ other_id }}">
+            <input type="hidden" name="reason" value="Khác">
+            <input type="hidden" name="detail" value="Báo cáo từ phòng chat">
+            <button class="px-3 py-1.5 text-xs font-bold rounded bg-amber-50 text-amber-700 hover:bg-amber-100">Báo cáo</button>
+          </form>
+          <form method="POST" action="{{ url_for('safety.block') }}"
+                onsubmit="return confirm('Chặn người này? Bạn sẽ không nhắn tin được nữa.')">
+            <input type="hidden" name="target_id" value="{{ other_id }}">
+            <button class="px-3 py-1.5 text-xs font-bold rounded bg-red-50 text-red-700 hover:bg-red-100">Chặn</button>
+          </form>
+        </div>
+        {% endif %}
+      </div>
+
+      <div id="messages" class="h-72 overflow-y-auto border border-gray-200 rounded-lg p-3 bg-gray-50 text-sm space-y-2">
+        {% for m in messages %}
+        <div><b>{{ 'Bạn' if m.user_id == current_user.id else m.author.username }}:</b> {{ m.content }}</div>
+        {% else %}
+        <p class="text-gray-400">Chưa có tin nhắn. Hãy mở đầu cuộc trò chuyện!</p>
+        {% endfor %}
+      </div>
+
+      <form id="send-form" class="flex gap-2 mt-3">
+        <input id="msg-input" maxlength="500" {% if not can_send %}disabled{% endif %}
+               placeholder="{% if can_send %}Nhập tin nhắn...{% else %}Không thể gửi tin trong phòng này{% endif %}"
+               class="flex-1 border border-gray-300 rounded px-3 py-2 text-sm">
+        <button {% if not can_send %}disabled{% endif %}
+                class="px-4 py-2 rounded bg-[#0056D2] text-white text-sm font-bold disabled:bg-gray-300">Gửi</button>
+      </form>
+    </section>
+
+    <section class="bg-white rounded-xl border border-gray-200 p-4 space-y-3">
+      <h2 class="font-bold text-gray-900">Trợ lý AI</h2>
+      <p class="text-xs text-gray-500">Dán code và thông báo lỗi, chọn mức gợi ý để AI giải thích bằng tiếng Việt.</p>
+      <textarea id="ai-code" rows="4" placeholder="Code của bạn (không bắt buộc)" class="w-full border border-gray-300 rounded px-3 py-2 text-sm font-mono"></textarea>
+      <textarea id="ai-error" rows="2" placeholder="Thông báo lỗi hoặc câu hỏi" class="w-full border border-gray-300 rounded px-3 py-2 text-sm"></textarea>
+      <div class="flex gap-2 items-center">
+        <select id="ai-level" class="border border-gray-300 rounded px-3 py-2 text-sm">
+          <option value="1">Mức 1: gợi ý hướng</option>
+          <option value="2">Mức 2: chỉ chỗ sai</option>
+          <option value="3">Mức 3: giải thích và ví dụ</option>
+        </select>
+        <button id="ai-ask" class="px-4 py-2 rounded bg-indigo-600 text-white text-sm font-bold">Hỏi AI</button>
+      </div>
+      <pre id="ai-answer" class="whitespace-pre-wrap text-sm bg-indigo-50 rounded p-3 min-h-[2rem]"></pre>
+    </section>
+    {% else %}
+    <div class="bg-white rounded-xl border border-dashed border-gray-300 p-8 text-center text-gray-500">
+      Chưa có phòng trò chuyện nào. Bạn có thể <a href="{{ url_for('buddy.index') }}" class="text-[#0056D2] font-bold underline">Ghép cặp Bạn học</a> hoặc tạo Nhóm học mới ở khung bên trái.
+    </div>
+    {% endif %}
+  </main>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdn.jsdelivr.net/npm/socket.io-client@4.7.5/dist/socket.io.min.js"></script>
+<script>
+  const ME = {{ current_user.id }};
+  const ROOM_ID = {{ current.id if current else 'null' }};
+  const AI_URL = "{{ url_for('ai.explain') }}";
+  const box = document.getElementById("messages");
+
+  function renderMessage(m) {
+    const row = document.createElement("div");
+    const who = document.createElement("b");
+    who.textContent = (m.user_id === ME ? "Bạn" : m.username) + ": ";
+    const text = document.createElement("span");
+    text.textContent = m.content;
+    row.append(who, text);
+    box.appendChild(row);
+    box.scrollTop = box.scrollHeight;
+  }
+
+  if (ROOM_ID !== null) {
+    const socket = io();
+    socket.on("connect", () => socket.emit("join_chat_room", { room_id: ROOM_ID }));
+    socket.on("new_message", (m) => { if (m.room_id === ROOM_ID) renderMessage(m); });
+
+    document.getElementById("send-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const input = document.getElementById("msg-input");
+      const content = input.value.trim();
+      if (!content) return;
+      socket.emit("send_message", { room_id: ROOM_ID, content }, (res) => {
+        if (!res.ok) alert(res.error);
+      });
+      input.value = "";
+    });
+  }
+
+  const askBtn = document.getElementById("ai-ask");
+  if (askBtn) {
+    askBtn.addEventListener("click", async () => {
+      const out = document.getElementById("ai-answer");
+      const error = document.getElementById("ai-error").value.trim();
+      if (!error) { out.textContent = "Hãy nhập thông báo lỗi hoặc câu hỏi."; return; }
+      out.textContent = "Đang hỏi AI...";
+      const res = await fetch(AI_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: document.getElementById("ai-code").value,
+          error,
+          level: Number(document.getElementById("ai-level").value),
+        }),
+      });
+      const data = await res.json().catch(() => ({ ok: false, error: "Lỗi kết nối" }));
+      out.textContent = data.ok ? data.answer : data.error;
+    });
+  }
+
+  if (box) box.scrollTop = box.scrollHeight;
+</script>
+{% endblock %}

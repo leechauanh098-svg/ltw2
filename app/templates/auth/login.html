@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block title %}Đăng nhập hoặc Đăng ký - WebPath Coursera{% endblock %}
+
+{% block content %}
+<div class="bg-white border-b border-gray-200">
+    <div class="max-w-6xl mx-auto px-4 py-10">
+        <!-- Quick Demo Box for all Roles -->
+        <div class="mb-8 p-6 rounded-lg bg-[#F0F6FF] border border-blue-200 flex flex-col lg:flex-row items-center justify-between gap-6">
+            <div>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold uppercase bg-[#0056D2] text-white mb-2">
+                    Đăng nhập Nhanh 1-Click (Demo Đầy Đủ Các Vai Trò)
+                </span>
+                <h1 class="text-2xl font-bold text-[#1F1F1F]">Website Học Lập Trình Web Theo Lộ Trình Cho Người Mới Bắt Đầu</h1>
+                <p class="text-sm text-gray-600 mt-1">Chọn ngay 1 trong 3 vai trò dưới đây để kiểm thử toàn bộ chức năng của Module M10 – LMS/LCMS:</p>
+            </div>
+            <div class="flex flex-wrap items-center gap-2.5 shrink-0">
+                <a href="{{ url_for('auth.quick_login', role='learner') }}" class="px-4 py-2.5 rounded bg-[#0056D2] hover:bg-[#00419E] text-white font-bold text-xs transition shadow-sm">
+                    <i class="fa-solid fa-user-graduate mr-1.5"></i>1. Người học (hocvien)
+                </a>
+                <a href="{{ url_for('auth.quick_login', role='instructor') }}" class="px-4 py-2.5 rounded bg-[#0E8043] hover:bg-emerald-800 text-white font-bold text-xs transition shadow-sm">
+                    <i class="fa-solid fa-chalkboard-user mr-1.5"></i>2. Mentor / GV (mentor)
+                </a>
+                <a href="{{ url_for('auth.quick_login', role='admin') }}" class="px-4 py-2.5 rounded bg-white hover:bg-gray-50 text-[#0056D2] border border-[#0056D2] font-bold text-xs transition">
+                    <i class="fa-solid fa-user-shield mr-1.5"></i>3. Quản trị viên (admin)
+                </a>
+            </div>
+        </div>
+
+        <div class="grid md:grid-cols-2 gap-8">
+            <!-- Login Card -->
+            <div class="bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
+                <h2 class="text-2xl font-bold text-[#1F1F1F]">Đăng nhập Tài khoản</h2>
+                <p class="text-xs text-gray-500 mt-1 mb-6">
+                    Tài khoản mẫu: <code class="font-bold text-[#0056D2]">hocvien</code>, <code class="font-bold text-[#0E8043]">mentor</code>, hoặc <code class="font-bold text-indigo-700">admin</code> (Mật khẩu chung: <code class="font-bold">123456</code>)
+                </p>
+
+                <form method="POST" action="{{ url_for('auth.login') }}" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1.5">Email hoặc Tên đăng nhập</label>
+                        <input type="text" name="username" value="hocvien" required class="w-full px-3.5 py-2.5 rounded border border-gray-300 text-gray-900 focus:border-[#0056D2] focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1.5">Mật khẩu</label>
+                        <input type="password" name="password" value="123456" required class="w-full px-3.5 py-2.5 rounded border border-gray-300 text-gray-900 focus:border-[#0056D2] focus:outline-none">
+                    </div>
+                    <button type="submit" class="w-full py-3 rounded bg-[#0056D2] hover:bg-[#00419E] font-bold text-white text-sm transition">
+                        Đăng nhập
+                    </button>
+                </form>
+            </div>
+
+            <!-- Register Card -->
+            <div class="bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
+                <h2 class="text-2xl font-bold text-[#1F1F1F]">Đăng ký Học viên Mới</h2>
+                <p class="text-xs text-gray-500 mt-1 mb-6">Sau khi đăng ký, bạn sẽ được chuyển tới bài Test đầu vào để xếp lộ trình học Web phù hợp.</p>
+
+                <form method="POST" action="{{ url_for('auth.register') }}" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1.5">Tên học viên (Username)</label>
+                        <input type="text" name="username" placeholder="vd: minh_khoa" required class="w-full px-3.5 py-2.5 rounded border border-gray-300 text-gray-900 focus:border-[#0056D2] focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1.5">Địa chỉ Email</label>
+                        <input type="email" name="email" placeholder="name@example.com" required class="w-full px-3.5 py-2.5 rounded border border-gray-300 text-gray-900 focus:border-[#0056D2] focus:outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold uppercase text-gray-700 mb-1.5">Mật khẩu</label>
+                        <input type="password" name="password" placeholder="Tối thiểu 6 ký tự" required class="w-full px-3.5 py-2.5 rounded border border-gray-300 text-gray-900 focus:border-[#0056D2] focus:outline-none">
+                    </div>
+                    <button type="submit" class="w-full py-3 rounded bg-white hover:bg-[#F0F6FF] border-2 border-[#0056D2] font-bold text-[#0056D2] text-sm transition">
+                        Đăng ký & Làm Test Đầu Vào
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

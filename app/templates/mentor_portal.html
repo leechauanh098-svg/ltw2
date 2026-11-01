@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block title %}Cổng Mentor / Giảng viên & Quản trị viên (Module M10){% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+    <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <span class="px-2.5 py-0.5 rounded bg-[#F0F6FF] text-[#0056D2] text-xs font-bold uppercase">
+                Module M10 – Quản trị LMS/LCMS & Mentor Review
+            </span>
+            <h1 class="text-2xl font-extrabold text-[#1F1F1F] mt-1">
+                Bảng Điều Khiển Mentor / Giảng Viên & Quản Trị Viên
+            </h1>
+            <p class="text-xs text-gray-600 mt-0.5">
+                Theo dõi tiến độ học viên trên Cây kỹ năng, viết nhận xét bài làm (Code Review) và quản lý phân quyền tài khoản.
+            </p>
+        </div>
+        <a href="{{ url_for('skills.tree_view') }}" class="px-4 py-2.5 rounded bg-[#0056D2] text-white text-xs font-bold">
+            <i class="fa-solid fa-sitemap mr-1.5"></i>Quản lý Cạnh Đồ thị DAG
+        </a>
+    </div>
+
+    <div class="grid lg:grid-cols-12 gap-8">
+        <!-- Left 7 Columns: Mentor Chấm & Nhận xét bài làm của Người học -->
+        <div class="lg:col-span-7 bg-white border border-gray-200 rounded-lg p-6 shadow-sm space-y-4">
+            <h2 class="text-lg font-bold text-[#1F1F1F] pb-3 border-b border-gray-200">
+                <i class="fa-solid fa-comments text-[#0056D2] mr-2"></i>Nhận xét Bài làm của Người học (Mentor Code Review)
+            </h2>
+
+            {% if submissions %}
+                <div class="space-y-4">
+                    {% for sub in submissions %}
+                    <div class="p-4 rounded-lg bg-[#F5F7F8] border border-gray-200 space-y-3 text-xs">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <span class="font-bold text-[#1F1F1F] text-sm">{{ sub.user.username }}</span>
+                                <span class="text-gray-500 mx-1">•</span>
+                                <span class="font-semibold text-[#0056D2]">{{ sub.exercise.title }}</span>
+                            </div>
+                            <span class="px-2.5 py-0.5 rounded font-bold
+                                {% if sub.status == 'AC' %}bg-emerald-50 text-[#0E8043] border border-emerald-200
+                                {% else %}bg-red-50 text-red-700 border border-red-200{% endif %}">
+                                {{ sub.status }} ({{ sub.passed_test_cases }}/{{ sub.total_test_cases }} test)
+                            </span>
+                        </div>
+
+                        <pre class="bg-slate-900 text-slate-100 p-3 rounded font-mono text-[11px] overflow-x-auto">{{ sub.source_code }}</pre>
+
+                        <form method="POST" action="{{ url_for('main.review_submission', submission_id=sub.id) }}" class="flex gap-2">
+                            <input type="text" name="mentor_comment" value="{{ sub.mentor_comment or '' }}" placeholder="Nhập nhận xét hoặc góp ý tối ưu code cho học viên..." class="flex-1 px-3 py-2 rounded border border-gray-300 bg-white text-gray-900 focus:border-[#0056D2] focus:outline-none">
+                            <button type="submit" class="px-4 py-2 rounded bg-[#0056D2] hover:bg-[#00419E] text-white font-bold transition">
+                                Lưu Nhận xét
+                            </button>
+                        </form>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="text-xs text-gray-500">Chưa có bài nộp nào từ học viên.</p>
+            {% endif %}
+        </div>
+
+        <!-- Right 5 Columns: Tiến độ Học viên & Quản lý Phân quyền (Admin) -->
+        <div class="lg:col-span-5 bg-white border border-gray-200 rounded-lg p-6 shadow-sm space-y-4">
+            <h2 class="text-lg font-bold text-[#1F1F1F] pb-3 border-b border-gray-200">
+                <i class="fa-solid fa-users-gear text-[#0056D2] mr-2"></i>Quản lý Tài khoản & Tiến độ Lộ trình
+            </h2>
+
+            <div class="divide-y divide-gray-200 text-xs">
+                {% for u in learners %}
+                <div class="py-3.5 flex items-center justify-between gap-2">
+                    <div>
+                        <p class="font-bold text-[#1F1F1F] text-sm">{{ u.username }} <span class="text-xs font-normal text-gray-500">({{ u.email }})</span></p>
+                        <p class="text-gray-600 mt-0.5">
+                            XP: <strong class="text-[#0056D2]">{{ u.total_xp }}</strong> • Chuỗi: <strong>{{ u.current_streak }} ngày</strong> • {{ u.placement_level }}
+                        </p>
+                    </div>
+
+                    {% if current_user.role == 'admin' %}
+                    <form method="POST" action="{{ url_for('main.update_user_role', user_id=u.id) }}" class="flex items-center gap-1.5">
+                        <select name="role" class="px-2 py-1 rounded border border-gray-300 bg-white font-semibold">
+                            <option value="learner" {% if u.role == 'learner' %}selected{% endif %}>Người học</option>
+                            <option value="instructor" {% if u.role == 'instructor' %}selected{% endif %}>Mentor/GV</option>
+                            <option value="admin" {% if u.role == 'admin' %}selected{% endif %}>Admin</option>
+                        </select>
+                        <button type="submit" class="px-2.5 py-1 rounded bg-gray-800 text-white font-bold">Lưu</button>
+                    </form>
+                    {% else %}
+                    <span class="px-2 py-1 rounded bg-gray-100 font-bold uppercase text-gray-700">{{ u.role }}</span>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

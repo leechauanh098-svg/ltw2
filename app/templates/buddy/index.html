@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Bạn học - Ghép cặp cùng lộ trình{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 py-8 space-y-8">
+  <div>
+    <h1 class="text-2xl font-extrabold text-gray-900">Tìm bạn học cùng lộ trình</h1>
+    <p class="text-sm text-gray-500 mt-1">Ghép với người có cùng lộ trình và trình độ gần nhau. Khi hai bạn cùng chọn "Ghép", hệ thống mở phòng chat riêng.</p>
+  </div>
+
+  <section class="bg-white rounded-xl border border-gray-200 p-6">
+    <h2 class="font-bold text-gray-900 mb-4">Hồ sơ của bạn</h2>
+    {% if roadmaps %}
+    <form method="POST" action="{{ url_for('buddy.save_profile') }}" class="grid md:grid-cols-4 gap-4 items-end">
+      <label class="text-sm font-semibold text-gray-700">Lộ trình
+        <select name="roadmap_id" class="mt-1 w-full border border-gray-300 rounded px-3 py-2">
+          {% for r in roadmaps %}
+          <option value="{{ r.id }}" {% if profile and profile.roadmap_id == r.id %}selected{% endif %}>{{ r.title }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="text-sm font-semibold text-gray-700">Trình độ
+        <select name="level" class="mt-1 w-full border border-gray-300 rounded px-3 py-2">
+          {% for lv, label in [(1, 'Mức 1 · Mới bắt đầu'), (2, 'Mức 2 · Đã có nền tảng'), (3, 'Mức 3 · Nâng cao')] %}
+          <option value="{{ lv }}" {% if profile and profile.level == lv %}selected{% endif %}>{{ label }}</option>
+          {% endfor %}
+        </select>
+      </label>
+      <label class="flex items-center gap-2 text-sm font-semibold text-gray-700">
+        <input type="checkbox" name="available" {% if not profile or profile.available %}checked{% endif %} class="w-4 h-4">
+        Đang sẵn sàng ghép
+      </label>
+      <button type="submit" class="px-5 py-2.5 rounded bg-[#0056D2] hover:bg-[#00419E] text-white font-bold text-sm">Lưu hồ sơ</button>
+    </form>
+    {% else %}
+    <p class="text-sm text-gray-500">Chưa có lộ trình nào trong hệ thống.</p>
+    {% endif %}
+  </section>
+
+  <section>
+    <h2 class="font-bold text-gray-900 mb-4">Ứng viên gợi ý</h2>
+    {% if not profile %}
+      <div class="bg-white rounded-xl border border-dashed border-gray-300 p-8 text-center text-gray-500">Hãy lưu hồ sơ ở trên để xem ứng viên.</div>
+    {% elif not candidates %}
+      <div class="bg-white rounded-xl border border-dashed border-gray-300 p-8 text-center text-gray-500">Chưa có ứng viên phù hợp. Thử lại khi có thêm bạn học cùng lộ trình.</div>
+    {% else %}
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      {% for c in candidates %}
+      <div class="bg-white rounded-xl border border-gray-200 p-5">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-blue-50 text-[#0056D2] font-bold flex items-center justify-center">{{ c.user.username[:2]|upper }}</div>
+          <div>
+            <p class="font-bold text-gray-900">{{ c.user.username }}</p>
+            <p class="text-xs text-gray-500">Mức {{ c.level }} · {{ c.roadmap.title }}</p>
+          </div>
+        </div>
+
+        <div class="flex gap-2 mt-4">
+          <form method="POST" action="{{ url_for('buddy.swipe') }}" class="flex-1">
+            <input type="hidden" name="target_id" value="{{ c.user_id }}">
+            <input type="hidden" name="action" value="like">
+            <button class="w-full py-2 rounded bg-[#0056D2] hover:bg-[#00419E] text-white text-sm font-bold">Ghép</button>
+          </form>
+          <form method="POST" action="{{ url_for('buddy.swipe') }}" class="flex-1">
+            <input type="hidden" name="target_id" value="{{ c.user_id }}">
+            <input type="hidden" name="action" value="pass">
+            <button class="w-full py-2 rounded bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-bold">Bỏ qua</button>
+          </form>
+        </div>
+
+        <details class="mt-3 text-sm">
+          <summary class="cursor-pointer text-gray-500 hover:text-gray-800">Báo cáo hoặc chặn</summary>
+          <form method="POST" action="{{ url_for('safety.report') }}" class="mt-2 space-y-2">
+            <input type="hidden" name="target_id" value="{{ c.user_id }}">
+            <select name="reason" class="w-full border border-gray-300 rounded px-2 py-1.5">
+              <option>Spam hoặc quảng cáo</option>
+              <option>Quấy rối hoặc xúc phạm</option>
+              <option>Nội dung không phù hợp</option>
+              <option>Khác</option>
+            </select>
+            <textarea name="detail" rows="2" maxlength="400" placeholder="Mô tả thêm (không bắt buộc)" class="w-full border border-gray-300 rounded px-2 py-1.5"></textarea>
+            <button class="w-full py-1.5 rounded bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold">Gửi báo cáo</button>
+          </form>
+          <form method="POST" action="{{ url_for('safety.block') }}" class="mt-2"
+                onsubmit="return confirm('Chặn người này? Bạn sẽ không còn thấy họ và không nhắn tin được.')">
+            <input type="hidden" name="target_id" value="{{ c.user_id }}">
+            <button class="w-full py-1.5 rounded bg-red-50 hover:bg-red-100 text-red-700 text-xs font-bold">Chặn</button>
+          </form>
+        </details>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+  </section>
+</div>
+{% endblock %}

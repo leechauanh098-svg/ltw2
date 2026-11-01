@@ -1,0 +1,386 @@
+{% extends "base.html" %}
+{% block title %}{{ exercise.title }} - Thực hành Củng cố Bài giảng NEU{% endblock %}
+
+{% block content %}
+<div class="workspace-shell flex flex-col bg-white">
+    <!-- Responsive Coding Lab Top Sub-Header -->
+    <div class="bg-white border-b border-gray-200 px-3 sm:px-4 py-2.5 flex flex-col md:flex-row md:items-center justify-between gap-2.5">
+        <div class="flex items-start sm:items-center space-x-2.5 min-w-0">
+            {% if exercise.lesson %}
+            <a href="{{ url_for('main.lesson_detail', slug=exercise.lesson.slug) }}" class="px-2.5 py-1.5 rounded border border-[#0056D2] bg-[#F0F6FF] hover:bg-blue-100 text-xs font-bold text-[#0056D2] transition shrink-0" title="Quay lại đọc trang Bài giảng lý thuyết">
+                <i class="fa-solid fa-book-open mr-1"></i><span>1. Đọc Bài giảng</span>
+            </a>
+            {% else %}
+            <a href="{{ url_for('main.dashboard') }}" class="px-2.5 py-1.5 rounded border border-gray-300 hover:bg-gray-50 text-xs font-bold text-gray-700 transition shrink-0">
+                <i class="fa-solid fa-arrow-left mr-1"></i><span>Về Lộ trình</span>
+            </a>
+            {% endif %}
+
+            <div class="min-w-0">
+                <div class="flex flex-wrap items-center gap-1.5">
+                    <span class="px-2 py-0.5 rounded bg-emerald-50 text-[#0E8043] border border-emerald-200 text-[10px] font-bold">
+                        2. Thực hành Củng cố
+                    </span>
+                    <span class="px-2 py-0.5 rounded bg-[#F0F6FF] text-[#0056D2] border border-blue-200 text-[10px] font-bold truncate max-w-[220px] sm:max-w-none">
+                        {{ exercise.scaffold_level }}
+                    </span>
+                    <span class="text-xs font-bold text-[#0E8043]">+{{ exercise.xp_reward }} XP</span>
+                </div>
+                <h1 class="text-sm sm:text-base font-extrabold text-[#1F1F1F] mt-0.5 truncate">{{ exercise.title }}</h1>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap items-center gap-2">
+            <button onclick="revealNextHint()" class="px-2.5 sm:px-3 py-1.5 rounded bg-amber-50 hover:bg-amber-100 text-amber-800 border border-amber-300 text-xs font-bold transition">
+                <i class="fa-solid fa-lightbulb mr-1 text-amber-500"></i>Gợi ý (<span id="hint-counter">0</span>/{{ exercise.hints|length }})
+            </button>
+
+            <select id="language-select" class="px-2.5 py-1.5 rounded border border-gray-300 bg-white text-xs font-bold text-gray-800 focus:border-[#0056D2] focus:outline-none">
+                <option value="python">Python 3</option>
+                <option value="cpp">C++ 17</option>
+            </select>
+
+            <button id="btn-run-sample" onclick="runSampleCode()" class="px-3 sm:px-4 py-1.5 rounded border-2 border-[#0056D2] text-[#0056D2] hover:bg-[#F0F6FF] text-xs font-bold transition">
+                <i class="fa-solid fa-play mr-1"></i>Chạy thử
+            </button>
+
+            <button id="btn-submit-code" onclick="submitCode()" class="px-3.5 sm:px-4 py-2 rounded bg-[#0056D2] hover:bg-[#00419E] text-xs font-bold text-white shadow-sm transition">
+                <i class="fa-solid fa-cloud-arrow-up mr-1"></i>Nộp bài
+            </button>
+        </div>
+    </div>
+
+    <!-- Mobile & iPad Portrait Tab Switcher (< 1024px) -->
+    <div class="lg:hidden bg-[#F5F7F8] border-b border-gray-200 px-3 py-2 grid grid-cols-2 gap-2 text-xs font-bold">
+        <button id="tab-btn-problem" onclick="switchWorkspaceTab('problem')" class="py-2 rounded-lg bg-[#0056D2] text-white shadow-sm transition">
+            <i class="fa-regular fa-file-lines mr-1.5"></i>1. Đề bài & Lý thuyết
+        </button>
+        <button id="tab-btn-editor" onclick="switchWorkspaceTab('editor')" class="py-2 rounded-lg bg-white text-gray-700 border border-gray-300 transition">
+            <i class="fa-solid fa-code mr-1.5"></i>2. Khung Code & AI Chấm
+        </button>
+    </div>
+
+    <!-- Split Pane Layout -->
+    <div class="flex-1 grid grid-cols-1 lg:grid-cols-12 lg:overflow-hidden">
+        <!-- Left Pane: Chuyển đổi linh hoạt giữa [Đề bài Thực hành] và [Nội dung Bài giảng Lý thuyết] ngay tại chỗ -->
+        <div id="pane-problem" class="workspace-pane lg:col-span-5 border-b lg:border-b-0 lg:border-r border-gray-200 lg:overflow-y-auto p-4 sm:p-6 flex-col space-y-4 bg-white">
+            <!-- Thanh chuyển đổi: [Yêu cầu Thực hành] <-> [Xem lại Lý thuyết Bài giảng] -->
+            {% if exercise.lesson %}
+            <div class="grid grid-cols-2 gap-1.5 p-1 rounded-lg bg-[#F5F7F8] border border-gray-200 text-xs font-bold">
+                <button type="button" id="subtab-btn-prob" onclick="switchLeftSubTab('prob')" class="py-2 px-3 rounded-md bg-white text-[#0056D2] shadow-sm transition flex items-center justify-center">
+                    <i class="fa-solid fa-laptop-code mr-1.5"></i>Đề bài Thực hành
+                </button>
+                <button type="button" id="subtab-btn-lecture" onclick="switchLeftSubTab('lecture')" class="py-2 px-3 rounded-md text-gray-600 hover:text-[#0056D2] transition flex items-center justify-center">
+                    <i class="fa-solid fa-book-open mr-1.5"></i>📖 Xem Lý thuyết Bài giảng
+                </button>
+            </div>
+            {% endif %}
+
+            {% if exercise.lesson and not lesson_completed %}
+            <div class="p-3 rounded-lg bg-amber-50 border border-amber-300 text-xs text-amber-900 flex items-center justify-between gap-2">
+                <span><i class="fa-solid fa-circle-info mr-1.5 text-amber-600"></i><strong>Lời khuyên:</strong> Bạn chưa đánh dấu đọc xong bài giảng lý thuyết của bài tập này!</span>
+                <button type="button" onclick="switchLeftSubTab('lecture')" class="shrink-0 px-2.5 py-1 rounded bg-amber-600 text-white font-bold">
+                    Đọc ngay
+                </button>
+            </div>
+            {% endif %}
+
+            <!-- Hộp hiển thị Gợi ý từng bước (Progressive Hints) -->
+            <div id="hints-box" class="hidden p-4 rounded-lg bg-amber-50 border border-amber-300 space-y-2 text-xs">
+                <div class="font-bold text-amber-900 flex items-center">
+                    <i class="fa-solid fa-wand-magic-sparkles mr-1.5 text-amber-600"></i>Gợi ý từng bước giúp bạn điền khung code:
+                </div>
+                <ul id="hints-list" class="list-disc list-inside space-y-1 text-amber-900"></ul>
+            </div>
+
+            <!-- Khung 1: Nội dung Đề bài Thực hành + Sample Test Cases -->
+            <div id="left-subpane-prob" class="space-y-5">
+                <div class="prose max-w-none text-sm leading-relaxed text-gray-800">
+                    {{ problem_html | safe }}
+                </div>
+
+                <div class="space-y-3 pt-4 border-t border-gray-200">
+                    <h3 class="text-xs font-bold uppercase tracking-wider text-gray-500">Bộ Test Case Mẫu (Sample Test Cases)</h3>
+                    {% for tc in sample_tests %}
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 bg-[#F5F7F8] border border-gray-200 p-3.5 rounded-lg text-xs font-mono">
+                        <div>
+                            <span class="text-[10px] font-sans font-bold uppercase text-gray-500 block mb-1">Input mẫu #{{ loop.index }}</span>
+                            <pre class="bg-white p-2 rounded border border-gray-200 text-gray-900 overflow-x-auto">{{ tc.input_data }}</pre>
+                        </div>
+                        <div>
+                            <span class="text-[10px] font-sans font-bold uppercase text-gray-500 block mb-1">Output mong đợi #{{ loop.index }}</span>
+                            <pre class="bg-white p-2 rounded border border-gray-200 text-[#0E8043] font-bold overflow-x-auto">{{ tc.expected_output }}</pre>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Khung 2: Nội dung Bài giảng Lý thuyết ngay trong Phòng Lab (Không cần chuyển trang) -->
+            {% if exercise.lesson %}
+            <div id="left-subpane-lecture" class="hidden space-y-4">
+                <div class="p-3.5 rounded-lg bg-[#F0F6FF] border border-blue-200 flex items-center justify-between text-xs">
+                    <span class="font-bold text-[#0056D2]">{{ exercise.lesson.title }}</span>
+                    <a href="{{ url_for('main.lesson_detail', slug=exercise.lesson.slug) }}" class="text-[#0056D2] underline font-bold shrink-0 ml-2">
+                        Mở toàn trang
+                    </a>
+                </div>
+                <div class="prose max-w-none text-sm leading-relaxed text-gray-800">
+                    {{ lesson_html | safe }}
+                </div>
+                <button type="button" onclick="switchLeftSubTab('prob')" class="w-full py-2.5 rounded-lg bg-[#0E8043] text-white font-bold text-xs">
+                    Đã hiểu lý thuyết! Quay lại Đề bài Thực hành &rarr;
+                </button>
+            </div>
+            {% endif %}
+
+            <!-- Nút chuyển nhanh sang khung Code trên Điện thoại / iPad -->
+            <div class="lg:hidden pt-2">
+                <button onclick="switchWorkspaceTab('editor')" class="w-full py-3 rounded-lg bg-[#0056D2] text-white font-bold text-xs shadow-sm">
+                    <i class="fa-solid fa-code mr-1.5"></i>Chuyển sang Khung Code để Làm bài &rarr;
+                </button>
+            </div>
+
+            <!-- Hiển thị Nhận xét của Mentor / Giảng viên nếu có -->
+            {% for sub in my_submissions %}
+                {% if sub.mentor_comment %}
+                <div class="p-4 rounded-lg bg-indigo-50 border border-indigo-200 text-xs space-y-1">
+                    <span class="font-bold text-indigo-900 block">
+                        <i class="fa-solid fa-chalkboard-user mr-1.5 text-indigo-600"></i>Nhận xét từ Mentor ({{ sub.mentor_name or 'Giảng viên' }}) cho bài nộp #{{ sub.id }}:
+                    </span>
+                    <p class="text-indigo-800">{{ sub.mentor_comment }}</p>
+                </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <!-- Right Pane: Monaco Code Editor + Trợ lý AI Giải thích lỗi bằng tiếng Việt -->
+        <div id="pane-editor" class="workspace-pane hidden lg:flex lg:col-span-7 flex-col lg:overflow-hidden bg-[#1E1E1E]">
+            <!-- Monaco Editor Container -->
+            <div id="monaco-editor-container" class="flex-1 min-h-[320px] w-full"></div>
+
+            <!-- Coursera Auto-Grader + Trợ lý AI Tiếng Việt Drawer -->
+            <div id="console-drawer" class="h-72 border-t border-gray-200 bg-white flex flex-col">
+                <div class="px-4 py-2 bg-[#F5F7F8] border-b border-gray-200 flex items-center justify-between text-xs">
+                    <span class="font-bold uppercase tracking-wider text-gray-700 truncate">
+                        <i class="fa-solid fa-robot text-[#0056D2] mr-1.5"></i>Kết quả Chấm Tự động & Trợ lý AI Tiếng Việt
+                    </span>
+                    <span id="judge-status-badge" class="px-2.5 py-0.5 rounded font-bold bg-gray-200 text-gray-700 shrink-0">
+                        Sẵn sàng
+                    </span>
+                </div>
+
+                <div id="judge-console-body" class="flex-1 p-4 overflow-y-auto text-xs space-y-3 text-gray-700">
+                    <div class="p-3.5 rounded-lg bg-[#F0F6FF] border border-blue-200 text-gray-800">
+                        <p class="font-bold text-[#0056D2] mb-1"><i class="fa-solid fa-robot mr-1.5"></i>Trợ lý AI Lập trình Web NEU xin chào!</p>
+                        <p>Hãy đọc kỹ lý thuyết ở tab <strong>"📖 Xem Lý thuyết Bài giảng"</strong> bên trái, sau đó hoàn thiện dòng đánh dấu <code># TODO</code> trong khung code rồi nhấn <strong>"Chạy thử"</strong> hoặc <strong>"Nộp bài"</strong>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs/loader.min.js"></script>
+<script>
+    const starterCodeMap = {{ exercise.starter_code | tojson }};
+    const exerciseHints = {{ (exercise.hints or []) | tojson }};
+    const exerciseId = {{ exercise.id }};
+    let editorInstance = null;
+    let shownHintsCount = 0;
+
+    require.config({ paths: { 'vs': 'https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.45.0/min/vs' }});
+    require(['vs/editor/editor.main'], function() {
+        editorInstance = monaco.editor.create(document.getElementById('monaco-editor-container'), {
+            value: starterCodeMap['python'] || '',
+            language: 'python',
+            theme: 'vs-dark',
+            fontSize: window.innerWidth < 768 ? 13 : 14,
+            minimap: { enabled: false },
+            automaticLayout: true,
+            wordWrap: 'on',
+            padding: { top: 14 }
+        });
+    });
+
+    function switchLeftSubTab(mode) {
+        const probBox = document.getElementById('left-subpane-prob');
+        const lecBox = document.getElementById('left-subpane-lecture');
+        const btnProb = document.getElementById('subtab-btn-prob');
+        const btnLec = document.getElementById('subtab-btn-lecture');
+        if (!lecBox) return;
+
+        if (mode === 'lecture') {
+            probBox.classList.add('hidden');
+            lecBox.classList.remove('hidden');
+            btnLec.className = 'py-2 px-3 rounded-md bg-white text-[#0056D2] shadow-sm transition flex items-center justify-center';
+            btnProb.className = 'py-2 px-3 rounded-md text-gray-600 hover:text-[#0056D2] transition flex items-center justify-center';
+        } else {
+            lecBox.classList.add('hidden');
+            probBox.classList.remove('hidden');
+            btnProb.className = 'py-2 px-3 rounded-md bg-white text-[#0056D2] shadow-sm transition flex items-center justify-center';
+            btnLec.className = 'py-2 px-3 rounded-md text-gray-600 hover:text-[#0056D2] transition flex items-center justify-center';
+        }
+    }
+
+    function switchWorkspaceTab(tabName) {
+        const problemPane = document.getElementById('pane-problem');
+        const editorPane = document.getElementById('pane-editor');
+        const btnProblem = document.getElementById('tab-btn-problem');
+        const btnEditor = document.getElementById('tab-btn-editor');
+
+        if (tabName === 'problem') {
+            problemPane.classList.remove('hidden');
+            problemPane.classList.add('flex');
+            editorPane.classList.add('hidden');
+            btnProblem.className = 'py-2 rounded-lg bg-[#0056D2] text-white shadow-sm transition';
+            btnEditor.className = 'py-2 rounded-lg bg-white text-gray-700 border border-gray-300 transition';
+        } else {
+            problemPane.classList.add('hidden');
+            editorPane.classList.remove('hidden');
+            editorPane.classList.add('flex');
+            btnEditor.className = 'py-2 rounded-lg bg-[#0056D2] text-white shadow-sm transition';
+            btnProblem.className = 'py-2 rounded-lg bg-white text-gray-700 border border-gray-300 transition';
+            if (editorInstance) {
+                setTimeout(() => editorInstance.layout(), 50);
+            }
+        }
+    }
+
+    function revealNextHint() {
+        if (window.innerWidth < 1024) {
+            switchWorkspaceTab('problem');
+        }
+        if (shownHintsCount < exerciseHints.length) {
+            const box = document.getElementById('hints-box');
+            const list = document.getElementById('hints-list');
+            box.classList.remove('hidden');
+            const li = document.createElement('li');
+            li.textContent = exerciseHints[shownHintsCount];
+            list.appendChild(li);
+            shownHintsCount++;
+            document.getElementById('hint-counter').textContent = shownHintsCount;
+        }
+    }
+
+    document.getElementById('language-select').addEventListener('change', function(e) {
+        const lang = e.target.value;
+        if (editorInstance) {
+            monaco.editor.setModelLanguage(editorInstance.getModel(), lang === 'cpp' ? 'cpp' : 'python');
+            editorInstance.setValue(starterCodeMap[lang] || '');
+        }
+    });
+
+    function setBadge(status) {
+        const badge = document.getElementById('judge-status-badge');
+        badge.textContent = status;
+        badge.className = 'px-2.5 py-0.5 rounded font-bold shrink-0 ';
+        if (status === 'AC') badge.className += 'bg-emerald-50 text-[#0E8043] border border-emerald-300';
+        else if (status === 'PENDING' || status === 'RUNNING') badge.className += 'bg-[#F0F6FF] text-[#0056D2] border border-blue-200 animate-pulse';
+        else badge.className += 'bg-red-50 text-red-700 border border-red-300';
+    }
+
+    function renderTestCasesList(details, summaryText = '', aiExplanation = '') {
+        const body = document.getElementById('judge-console-body');
+        let html = '';
+        if (summaryText) {
+            html += `<div class="p-3 rounded-lg bg-[#F5F7F8] border border-gray-200 text-gray-900">${summaryText}</div>`;
+        }
+        if (aiExplanation) {
+            const formattedAi = aiExplanation.replace(/\n/g, '<br>');
+            html += `
+                <div class="p-3.5 rounded-lg bg-indigo-50 border border-indigo-200 text-indigo-950 leading-relaxed">
+                    ${formattedAi}
+                </div>
+            `;
+        }
+        details.forEach(tc => {
+            const color = tc.verdict === 'AC'
+                ? 'text-[#0E8043] border-emerald-200 bg-emerald-50/50'
+                : 'text-red-700 border-red-200 bg-red-50/50';
+            html += `
+                <div class="p-3 rounded-lg border ${color}">
+                    <div class="flex items-center justify-between font-bold mb-1">
+                        <span><i class="fa-solid ${tc.verdict === 'AC' ? 'fa-circle-check' : 'fa-circle-xmark'} mr-1.5"></i>Test Case #${tc.index} ${tc.is_sample === false ? '(Test ẩn)' : '(Test mẫu)'}: ${tc.verdict}</span>
+                        <span class="text-gray-500 font-normal">${tc.time_ms} ms</span>
+                    </div>
+                    ${tc.stderr ? `<pre class="text-red-700 bg-white border border-red-200 p-2 rounded mt-1 font-mono overflow-x-auto">${tc.stderr}</pre>` : ''}
+                    ${tc.is_sample !== false ? `
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-1.5 text-[11px] text-gray-700 font-mono">
+                            <div class="bg-white p-1.5 rounded border border-gray-200"><span class="text-gray-400 font-sans block">Input:</span><code>${tc.input}</code></div>
+                            <div class="bg-white p-1.5 rounded border border-gray-200"><span class="text-gray-400 font-sans block">Expected:</span><code class="text-[#0E8043] font-bold">${tc.expected_output}</code></div>
+                            <div class="bg-white p-1.5 rounded border border-gray-200"><span class="text-gray-400 font-sans block">Actual:</span><code class="text-[#0056D2] font-bold">${tc.actual_output}</code></div>
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        });
+        body.innerHTML = html;
+    }
+
+    async function runSampleCode() {
+        if (window.innerWidth < 1024) {
+            switchWorkspaceTab('editor');
+        }
+        const lang = document.getElementById('language-select').value;
+        const code = editorInstance ? editorInstance.getValue() : '';
+        setBadge('RUNNING');
+        document.getElementById('judge-console-body').innerHTML = '<p class="text-[#0056D2] font-semibold"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Đang chạy thử và phân tích code với Trợ lý AI...</p>';
+
+        const res = await fetch('/judge/api/run-sample', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ exercise_id: exerciseId, language: lang, source_code: code })
+        });
+        const data = await res.json();
+        setBadge(data.overall_verdict);
+        renderTestCasesList(
+            data.details,
+            `Kết quả chạy thử Sample Test: <strong>${data.overall_verdict}</strong>`,
+            data.ai_explanation
+        );
+    }
+
+    async function submitCode() {
+        if (window.innerWidth < 1024) {
+            switchWorkspaceTab('editor');
+        }
+        const lang = document.getElementById('language-select').value;
+        const code = editorInstance ? editorInstance.getValue() : '';
+        setBadge('PENDING');
+        document.getElementById('judge-console-body').innerHTML = '<p class="text-[#0056D2] font-semibold"><i class="fa-solid fa-spinner fa-spin mr-2"></i>Hệ thống đang chấm tự động và cập nhật Cây Kỹ Năng...</p>';
+
+        const res = await fetch('/judge/api/submit', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ exercise_id: exerciseId, language: lang, source_code: code })
+        });
+        const subData = await res.json();
+        pollSubmissionStatus(subData.submission_id);
+    }
+
+    function pollSubmissionStatus(subId) {
+        const timer = setInterval(async () => {
+            const res = await fetch(`/judge/api/status/${subId}`);
+            const data = await res.json();
+            setBadge(data.status);
+
+            if (data.status !== 'PENDING' && data.status !== 'RUNNING') {
+                clearInterval(timer);
+                const xpElem = document.getElementById('nav-user-xp');
+                if (xpElem && data.user_total_xp !== undefined) {
+                    xpElem.textContent = data.user_total_xp;
+                }
+                let banner = `Kết quả chấm chính thức: <strong class="${data.status === 'AC' ? 'text-[#0E8043]' : 'text-red-700'}">${data.status}</strong> • Đạt <strong>${data.passed_test_cases}/${data.total_test_cases}</strong> test cases • Thời gian: <strong>${data.execution_time_ms} ms</strong>`;
+                if (data.status === 'AC') {
+                    banner += ` • <a href="/skills/" class="text-[#0056D2] underline font-bold ml-2">Xem các Node vừa mở khóa trên Cây Kỹ năng &rarr;</a>`;
+                }
+                renderTestCasesList(data.details, banner, data.ai_explanation);
+            }
+        }, 600);
+    }
+</script>
+{% endblock %}

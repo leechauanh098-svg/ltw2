@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Bảng xếp hạng XP Học viên (Module M16) - NEU WebPath{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <!-- Sub-Navigation M16 -->
+    <div class="bg-white border border-gray-200 rounded-xl p-4 sm:p-5 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <span class="px-2.5 py-0.5 rounded bg-amber-50 text-amber-700 border border-amber-200 text-xs font-bold uppercase">
+                Module M16 • Leaderboard
+            </span>
+            <h1 class="text-2xl font-extrabold text-[#1F1F1F] mt-1">
+                Bảng Xếp Hạng Thành Tích Học Viên NEU
+            </h1>
+        </div>
+        <div class="flex flex-wrap items-center gap-2 text-xs font-bold">
+            <a href="{{ url_for('m16.index') }}" class="px-3.5 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50">
+                <i class="fa-solid fa-chart-pie mr-1.5"></i>Tổng quan
+            </a>
+            <a href="{{ url_for('m16.progress') }}" class="px-3.5 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50">
+                <i class="fa-solid fa-bars-progress mr-1.5"></i>Tiến độ
+            </a>
+            <a href="{{ url_for('m16.achievements') }}" class="px-3.5 py-2 rounded-lg border border-gray-200 text-gray-700 hover:bg-gray-50">
+                <i class="fa-solid fa-medal mr-1.5 text-amber-500"></i>Huy hiệu & XP
+            </a>
+            <a href="{{ url_for('m16.leaderboard') }}" class="px-3.5 py-2 rounded-lg bg-[#0056D2] text-white">
+                <i class="fa-solid fa-trophy mr-1.5"></i>Bảng xếp hạng
+            </a>
+        </div>
+    </div>
+
+    <!-- Bảng xếp hạng -->
+    <div class="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
+        <table class="w-full text-left text-sm">
+            <thead class="bg-gray-50 text-xs uppercase text-gray-500 border-b border-gray-200">
+                <tr>
+                    <th class="p-4">Hạng</th>
+                    <th class="p-4">Học viên</th>
+                    <th class="p-4 hidden md:table-cell">Chặng Lộ trình Hiện tại</th>
+                    <th class="p-4 text-center">Node Mastered</th>
+                    <th class="p-4 text-center">Chuỗi Streak</th>
+                    <th class="p-4 text-right">Tổng XP</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for row in leaderboard %}
+                <tr class="{% if row.user_id == current_user.id %}bg-[#F0F6FF]/70{% else %}hover:bg-gray-50{% endif %} transition">
+                    <td class="p-4 font-extrabold">
+                        {% if row.rank == 1 %}
+                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-amber-100 text-amber-700">🥇</span>
+                        {% elif row.rank == 2 %}
+                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-slate-200 text-slate-700">🥈</span>
+                        {% elif row.rank == 3 %}
+                            <span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-orange-100 text-orange-800">🥉</span>
+                        {% else %}
+                            <span class="px-2 text-gray-600">#{{ row.rank }}</span>
+                        {% endif %}
+                    </td>
+                    <td class="p-4">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-full bg-[#0056D2] text-white font-bold text-xs flex items-center justify-center uppercase">
+                                {{ row.username[:2] }}
+                            </div>
+                            <div>
+                                <span class="font-bold text-gray-900">{{ row.username }}</span>
+                                {% if row.user_id == current_user.id %}
+                                    <span class="ml-1.5 px-2 py-0.5 rounded bg-blue-100 text-[#0056D2] text-[10px] font-bold">Bạn</span>
+                                {% endif %}
+                                <span class="block text-[11px] text-gray-500">{{ row.badges_count }} huy hiệu</span>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-4 hidden md:table-cell text-xs text-gray-600">{{ row.placement_level }}</td>
+                    <td class="p-4 text-center font-bold text-[#0E8043]">{{ row.mastered_nodes }}</td>
+                    <td class="p-4 text-center font-bold text-amber-600">
+                        <i class="fa-solid fa-fire mr-1"></i>{{ row.current_streak }} ngày
+                    </td>
+                    <td class="p-4 text-right font-extrabold text-[#0056D2]">{{ row.total_xp }} XP</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% if not leaderboard %}
+        <p class="p-6 text-center text-gray-500">Chưa có dữ liệu xếp hạng.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

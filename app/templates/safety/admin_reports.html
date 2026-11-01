@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Quản trị - Báo cáo vi phạm{% endblock %}
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-8">
+  <h1 class="text-2xl font-extrabold text-gray-900 mb-1">Báo cáo vi phạm</h1>
+  <p class="text-sm text-gray-500 mb-6">Các báo cáo đang mở từ người học.</p>
+
+  {% if not reports %}
+  <div class="bg-white rounded-xl border border-dashed border-gray-300 p-8 text-center text-gray-500">Không có báo cáo nào đang chờ xử lý.</div>
+  {% else %}
+  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <table class="w-full text-sm">
+      <thead class="bg-gray-50 text-left text-gray-500">
+        <tr>
+          <th class="p-3">#</th>
+          <th class="p-3">Người bị báo cáo</th>
+          <th class="p-3">Nội dung</th>
+          <th class="p-3">Thời gian</th>
+          <th class="p-3"></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in reports %}
+        <tr class="border-t border-gray-100">
+          <td class="p-3">{{ r.id }}</td>
+          <td class="p-3">{{ r.target.username }}</td>
+          <td class="p-3">{{ r.reason }}</td>
+          <td class="p-3">{{ r.created_at.strftime('%d/%m/%Y %H:%M') if r.created_at else '' }}</td>
+          <td class="p-3">
+            <form method="POST" action="{{ url_for('safety.resolve_report', report_id=r.id) }}">
+              <button class="px-3 py-1.5 rounded bg-emerald-600 text-white text-xs font-bold">Đã xử lý</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

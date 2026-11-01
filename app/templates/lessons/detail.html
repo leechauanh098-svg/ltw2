@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% block title %}{{ lesson.title }} - Bài giảng & Thực hành NEU{% endblock %}
+
+{% block content %}
+<!-- Breadcrumb & 2-Step Learning Flow Header -->
+<div class="bg-white border-b border-gray-200">
+    <div class="max-w-5xl mx-auto px-4 py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+        <div class="flex flex-wrap items-center gap-1.5 text-gray-500">
+            <a href="{{ url_for('main.dashboard') }}" class="text-[#0056D2] font-bold hover:underline">Lộ trình NEU</a>
+            <span>/</span>
+            <span class="truncate max-w-[220px] sm:max-w-none">{{ lesson.course.title }}</span>
+        </div>
+
+        <!-- Quy trình 2 bước: Đọc trước -> Thực hành sau -->
+        <div class="flex items-center space-x-2">
+            <span class="px-2.5 py-1 rounded-full bg-[#0056D2] text-white font-bold">
+                1. 📖 Đọc Bài giảng (+{{ lesson.xp_reward }} XP)
+            </span>
+            <i class="fa-solid fa-arrow-right text-gray-400"></i>
+            {% if related_exercises %}
+            <a href="{{ url_for('judge.workspace', slug=related_exercises[0].slug) }}" class="px-2.5 py-1 rounded-full bg-gray-100 hover:bg-[#F0F6FF] text-gray-700 hover:text-[#0056D2] border border-gray-300 font-bold transition">
+                2. 💻 Thực hành Củng cố (+{{ related_exercises[0].xp_reward }} XP)
+            </a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="max-w-4xl mx-auto px-4 py-8 space-y-6">
+    <!-- Nội dung Bài giảng Lý thuyết -->
+    <div class="bg-white border border-gray-200 rounded-lg p-6 sm:p-8 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-2">
+            <span class="text-xs font-bold uppercase tracking-wider text-[#0056D2]">
+                <i class="fa-solid fa-book-open mr-1.5"></i>Bước 1: Đọc Lý thuyết Bài giảng (Đề cương Khoa CNTT - NEU)
+            </span>
+            {% if progress and progress.is_completed %}
+                <span class="px-2.5 py-0.5 rounded bg-emerald-50 border border-emerald-300 text-[#0E8043] text-xs font-bold">
+                    <i class="fa-solid fa-circle-check mr-1"></i>Đã đọc xong lý thuyết
+                </span>
+            {% endif %}
+        </div>
+
+        <h1 class="text-2xl sm:text-3xl font-extrabold text-[#1F1F1F] mt-1 mb-6 pb-4 border-b border-gray-200">
+            {{ lesson.title }}
+        </h1>
+
+        <div class="prose max-w-none text-gray-800 leading-relaxed">
+            {{ html_content | safe }}
+        </div>
+
+        <!-- Thanh Hoàn thành Bài đọc & Chuyển thẳng sang Phòng Lab Thực hành -->
+        <div class="mt-8 pt-6 border-t border-gray-200 bg-[#F0F6FF]/60 -mx-6 sm:-mx-8 -mb-6 sm:-mb-8 p-6 sm:px-8 rounded-b-lg flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="text-xs text-gray-600">
+                <i class="fa-regular fa-clock mr-1 text-[#0056D2]"></i>Thời gian đọc bài giảng: <strong id="lesson-timer" class="text-gray-900">0</strong> giây
+                <p class="text-[11px] text-gray-500 mt-0.5">Sau khi nắm vững lý thuyết, hãy chuyển sang Bước 2 để viết code củng cố ngay trên Web.</p>
+            </div>
+
+            {% set first_ex = related_exercises[0] if related_exercises else None %}
+            <form method="POST" action="{{ url_for('main.complete_lesson', lesson_id=lesson.id) }}" class="w-full sm:w-auto">
+                <input type="hidden" name="time_spent" id="input-time-spent" value="15">
+                {% if first_ex %}
+                    <input type="hidden" name="next_exercise_slug" value="{{ first_ex.slug }}">
+                {% endif %}
+                <button type="submit" class="w-full sm:w-auto px-6 py-3 rounded-lg bg-[#0056D2] hover:bg-[#00419E] text-white text-sm font-bold transition shadow-sm flex items-center justify-center">
+                    <i class="fa-solid fa-laptop-code mr-2"></i>
+                    {% if first_ex %}
+                        Hoàn thành Bài giảng & Thực hành Củng cố Ngay (+{{ lesson.xp_reward }} XP) &rarr;
+                    {% else %}
+                        Đánh dấu Hoàn thành Bài giảng (+{{ lesson.xp_reward }} XP)
+                    {% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Danh sách Bài tập Thực hành gắn với Bài giảng này -->
+    {% if related_exercises %}
+    <div class="bg-white border-2 border-[#0056D2]/20 rounded-lg p-6 shadow-sm">
+        <span class="text-xs font-bold uppercase text-[#0E8043]">
+            <i class="fa-solid fa-puzzle-piece mr-1"></i>Bước 2: Thực hành Củng cố Kiến thức vừa đọc
+        </span>
+        <h3 class="text-lg font-bold text-[#1F1F1F] mt-1 mb-3">
+            Bài tập Lập trình Áp dụng Trực tiếp Bài giảng này
+        </h3>
+        <div class="space-y-3">
+            {% for ex in related_exercises %}
+            <div class="p-4 rounded-lg bg-[#F5F7F8] border border-gray-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                    <span class="text-[11px] font-bold px-2 py-0.5 rounded bg-white border border-blue-200 text-[#0056D2]">
+                        {{ ex.scaffold_level }}
+                    </span>
+                    <p class="text-base font-bold text-[#1F1F1F] mt-1.5">{{ ex.title }}</p>
+                    <p class="text-xs text-gray-500 mt-0.5">Phần thưởng: <strong class="text-[#0E8043]">+{{ ex.xp_reward }} XP</strong> • Có sẵn khung code `# TODO` và Trợ lý AI giải thích tiếng Việt.</p>
+                </div>
+                <a href="{{ url_for('judge.workspace', slug=ex.slug) }}" class="shrink-0 px-5 py-2.5 rounded bg-[#0E8043] hover:bg-emerald-800 text-white text-xs font-bold transition text-center">
+                    <i class="fa-solid fa-code mr-1.5"></i>Vào Phòng Lab Thực hành &rarr;
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    let sec = 0;
+    setInterval(() => {
+        sec++;
+        const timerEl = document.getElementById('lesson-timer');
+        const inputEl = document.getElementById('input-time-spent');
+        if (timerEl) timerEl.textContent = sec;
+        if (inputEl) inputEl.value = sec;
+    }, 1000);
+</script>
+{% endblock %}

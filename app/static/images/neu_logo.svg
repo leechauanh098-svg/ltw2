@@ -1,0 +1,38 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <defs>
+    <linearGradient id="neuBlue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0056D2" />
+      <stop offset="100%" stop-color="#003882" />
+    </linearGradient>
+    <linearGradient id="neuGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#FFD700" />
+      <stop offset="100%" stop-color="#E6A100" />
+    </linearGradient>
+  </defs>
+
+  <!-- Vòng tròn ngoài viền vàng kim & xanh truyền thống NEU -->
+  <circle cx="60" cy="60" r="57" fill="#FFFFFF" stroke="url(#neuGold)" stroke-width="4"/>
+  <circle cx="60" cy="60" r="51" fill="url(#neuBlue)" stroke="#FFFFFF" stroke-width="1.5"/>
+
+  <!-- Vòng tròn trong nền xanh dương đậm cùng đường kinh tuyến/vĩ tuyến quả địa cầu -->
+  <circle cx="60" cy="60" r="36" fill="#00469B" stroke="url(#neuGold)" stroke-width="2"/>
+  <ellipse cx="60" cy="60" rx="18" ry="35" fill="none" stroke="#60A5FA" stroke-width="1" opacity="0.55"/>
+  <ellipse cx="60" cy="60" rx="35" ry="15" fill="none" stroke="#60A5FA" stroke-width="1" opacity="0.55"/>
+  <line x1="24" y1="60" x2="96" y2="60" stroke="#60A5FA" stroke-width="1" opacity="0.55"/>
+  <line x1="60" y1="24" x2="60" y2="96" stroke="#60A5FA" stroke-width="1" opacity="0.55"/>
+
+  <!-- Ngọn đuốc & Ngôi sao vàng tri thức ở tâm -->
+  <polygon points="60,27 63,34 70,34 64.5,38.5 66.5,45.5 60,41 53.5,45.5 55.5,38.5 50,34 57,34" fill="url(#neuGold)"/>
+
+  <!-- Trang sách mở màu trắng & đỏ -->
+  <path d="M38,66 Q49,61 60,67 Q71,61 82,66 L82,78 Q71,73 60,79 Q49,73 38,78 Z" fill="#FFFFFF" stroke="#002D62" stroke-width="1.2"/>
+  <line x1="60" y1="67" x2="60" y2="79" stroke="#002D62" stroke-width="1.5"/>
+
+  <!-- Chữ NEU nổi bật ở trung tâm -->
+  <rect x="37" y="47" width="46" height="17" rx="3.5" fill="#D91F26" stroke="url(#neuGold)" stroke-width="1.5"/>
+  <text x="60" y="59.5" font-family="Arial, sans-serif" font-size="13.5" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="1.5">NEU</text>
+
+  <!-- Băng rôn năm thành lập 1956 -->
+  <rect x="44" y="83" width="32" height="11" rx="2" fill="url(#neuGold)"/>
+  <text x="60" y="91" font-family="Arial, sans-serif" font-size="7.5" font-weight="bold" fill="#002D62" text-anchor="middle">1956</text>
+</svg>

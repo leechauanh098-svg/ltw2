@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Quản trị Ngân hàng Câu hỏi Kiểm tra (Admin - Module M16){% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+    <div class="bg-white border border-gray-200 rounded-xl p-5 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+            <span class="px-2.5 py-0.5 rounded bg-indigo-50 text-indigo-700 text-xs font-bold uppercase">
+                Admin • Module M16
+            </span>
+            <h1 class="text-2xl font-extrabold text-gray-900 mt-1">
+                Quản Trị Ngân Hàng Câu Hỏi Kiểm Tra Đầu Vào
+            </h1>
+            <p class="text-xs text-gray-500 mt-0.5">Thêm câu hỏi trắc nghiệm mới hoặc ẩn/hiện câu hỏi trong đề Kiểm tra Năng lực Đầu vào.</p>
+        </div>
+        <a href="{{ url_for('main.placement_test') }}" class="px-4 py-2 rounded-lg bg-[#0056D2] text-white text-xs font-bold">
+            <i class="fa-solid fa-eye mr-1.5"></i>Xem Trang Test Đầu Vào
+        </a>
+    </div>
+
+    <!-- Form Thêm Câu Hỏi Mới -->
+    <form method="POST" action="{{ url_for('m16.admin_questions') }}" class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm space-y-4">
+        <h2 class="text-base font-extrabold text-gray-900">Thêm Câu Hỏi Trắc Nghiệm Mới</h2>
+        <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Nội dung câu hỏi *</label>
+            <textarea name="question_text" rows="2" required placeholder="Nhập nội dung câu hỏi kiểm tra..." class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"></textarea>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-3">
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Lựa chọn A *</label>
+                <input name="opt_a" required placeholder="Đáp án A" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Lựa chọn B *</label>
+                <input name="opt_b" required placeholder="Đáp án B" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Lựa chọn C *</label>
+                <input name="opt_c" required placeholder="Đáp án C" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Lựa chọn D *</label>
+                <input name="opt_d" required placeholder="Đáp án D" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+            </div>
+        </div>
+
+        <div class="grid sm:grid-cols-4 gap-3">
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Đáp án đúng *</label>
+                <select name="correct_index" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                    <option value="0">A (Lựa chọn 1)</option>
+                    <option value="1">B (Lựa chọn 2)</option>
+                    <option value="2">C (Lựa chọn 3)</option>
+                    <option value="3">D (Lựa chọn 4)</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Chủ đề (Topic)</label>
+                <input name="topic" value="HTML" placeholder="HTML / CSS / JS / HTTP" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Tầng độ khó (1-4)</label>
+                <select name="difficulty_tier" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                    <option value="1">Tầng 1 (Cơ bản)</option>
+                    <option value="2">Tầng 2 (Nền tảng)</option>
+                    <option value="3">Tầng 3 (Trung cấp)</option>
+                    <option value="4">Tầng 4 (Nâng cao)</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-gray-700 mb-1">Gắn với Node Kỹ năng</label>
+                <select name="skill_id" class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                    <option value="">-- Tự động / Chung --</option>
+                    {% for s in skills %}
+                    <option value="{{ s.id }}">{{ s.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-xs font-bold text-gray-700 mb-1">Giải thích đáp án</label>
+            <textarea name="explanation" rows="2" placeholder="Giải thích vì sao đáp án đó đúng..." class="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm"></textarea>
+        </div>
+
+        <button type="submit" class="px-5 py-2.5 rounded-lg bg-[#0056D2] hover:bg-[#00419E] text-white text-sm font-bold">
+            <i class="fa-solid fa-plus mr-1.5"></i>Lưu Câu Hỏi Mới
+        </button>
+    </form>
+
+    <!-- Danh sách câu hỏi -->
+    <div class="space-y-3">
+        <h2 class="text-base font-extrabold text-gray-900">Danh sách Câu hỏi Hiện có ({{ questions|length }})</h2>
+        {% for q in questions %}
+        <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-sm flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+            <div class="space-y-1.5 text-xs">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="font-extrabold text-[#0056D2]">#{{ q.id }} • {{ q.topic }}</span>
+                    <span class="px-2 py-0.5 rounded bg-gray-100 text-gray-600 font-semibold">Tầng {{ q.difficulty_tier }}</span>
+                    <span class="px-2 py-0.5 rounded font-bold {% if q.is_active %}bg-emerald-50 text-[#0E8043]{% else %}bg-red-50 text-red-700{% endif %}">
+                        {{ 'Đang hoạt động' if q.is_active else 'Đã ẩn' }}
+                    </span>
+                </div>
+                <p class="text-sm font-bold text-gray-900">{{ q.question_text }}</p>
+                <div class="grid sm:grid-cols-2 gap-1.5 pt-1">
+                    {% for opt in q.options_json %}
+                    <div class="px-2.5 py-1 rounded border {% if loop.index0 == q.correct_index %}bg-emerald-50 border-emerald-300 text-[#0E8043] font-bold{% else %}bg-gray-50 border-gray-200 text-gray-600{% endif %}">
+                        {{ ['A', 'B', 'C', 'D'][loop.index0] }}. {{ opt }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% if q.explanation %}
+                <p class="text-gray-500 pt-1"><strong>Giải thích:</strong> {{ q.explanation }}</p>
+                {% endif %}
+            </div>
+            <form method="POST" action="{{ url_for('m16.toggle_question', q_id=q.id) }}" class="shrink-0">
+                <button type="submit" class="px-3 py-1.5 rounded border text-xs font-bold {% if q.is_active %}border-red-200 text-red-600 hover:bg-red-50{% else %}border-emerald-200 text-[#0E8043] hover:bg-emerald-50{% endif %}">
+                    {{ 'Ẩn câu hỏi' if q.is_active else 'Hiện lại' }}
+                </button>
+            </form>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

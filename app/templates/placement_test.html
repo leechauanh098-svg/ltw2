@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+{% block title %}Test Đầu Vào Xếp Lộ Trình Học Web - WebPath Coursera{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-8 space-y-6">
+    <!-- Header -->
+    <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+        <span class="px-2.5 py-0.5 rounded bg-[#F0F6FF] text-[#0056D2] text-xs font-bold uppercase">
+            Đánh giá Năng lực Ban đầu (Placement Test)
+        </span>
+        <h1 class="text-2xl font-extrabold text-[#1F1F1F] mt-2">
+            Bài Test Đầu Vào Xếp Lộ Trình Lập Trình Web
+        </h1>
+        <p class="text-sm text-gray-600 mt-1">
+            Hoàn thành 5 câu hỏi nhanh dưới đây để hệ thống xác định trình độ hiện tại của bạn và <strong>tự động mở khóa trước các Node kỹ năng bạn đã nắm vững</strong> trên Cây Kỹ năng.
+        </p>
+    </div>
+
+    {% if result_summary %}
+    <!-- Kết quả đánh giá & Lộ trình đề xuất -->
+    <div class="bg-emerald-50 border-2 border-[#0E8043] rounded-lg p-6 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <span class="text-xs font-bold uppercase text-[#0E8043]">Kết quả Đánh giá Năng lực</span>
+                <h2 class="text-xl font-extrabold text-[#1F1F1F] mt-0.5">
+                    Bạn trả lời đúng {{ result_summary.correct }} / {{ result_summary.total }} câu hỏi!
+                </h2>
+                <p class="text-sm text-gray-700 mt-1">
+                    Chặng xuất phát phù hợp nhất: <strong class="text-[#0056D2]">{{ result_summary.recommended_level }}</strong>
+                </p>
+            </div>
+            <div class="flex items-center gap-3 shrink-0">
+                <a href="{{ url_for('skills.tree_view') }}" class="px-4 py-2.5 rounded bg-[#0056D2] hover:bg-[#00419E] text-white text-xs font-bold transition">
+                    <i class="fa-solid fa-sitemap mr-1.5"></i>Xem Cây Kỹ năng Đã Mở khóa
+                </a>
+                {% if current_user.is_authenticated %}
+                <a href="{{ url_for('main.dashboard') }}" class="px-4 py-2.5 rounded bg-white border border-gray-300 text-gray-800 text-xs font-bold">
+                    Về Lộ trình của tôi
+                </a>
+                {% else %}
+                <a href="{{ url_for('auth.login') }}" class="px-4 py-2.5 rounded bg-[#0E8043] text-white text-xs font-bold">
+                    Đăng ký Lưu Kết quả
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="space-y-2 pt-3 border-t border-emerald-200 text-xs">
+            {% for item in result_summary.details %}
+            <div class="p-3 rounded bg-white border border-gray-200">
+                <p class="font-bold text-[#1F1F1F]">
+                    {% if item.is_correct %}
+                        <i class="fa-solid fa-circle-check text-[#0E8043] mr-1.5"></i>
+                    {% else %}
+                        <i class="fa-solid fa-circle-xmark text-red-600 mr-1.5"></i>
+                    {% endif %}
+                    {{ item.question }}
+                </p>
+                <p class="text-gray-600 mt-1">Đáp án chuẩn: <strong class="text-[#0E8043]">{{ item.correct_answer }}</strong> — {{ item.explanation }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+
+    <!-- Form Câu hỏi Test Đầu Vào -->
+    <form method="POST" action="{{ url_for('main.placement_test') }}" class="space-y-4">
+        {% for q in questions %}
+        <div class="bg-white border border-gray-200 rounded-lg p-6 shadow-sm">
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-xs font-bold uppercase text-[#0056D2]">
+                    Kỹ năng kiểm tra: {{ q.skill.name if q.skill else 'Lập trình Web' }}
+                </span>
+                <span class="text-xs text-gray-400 font-semibold">Tầng {{ q.difficulty_tier }}</span>
+            </div>
+            <h3 class="text-base font-bold text-[#1F1F1F] mb-4">{{ q.question_text }}</h3>
+
+            <div class="space-y-2.5">
+                {% for opt in q.options_json %}
+                <label class="flex items-center space-x-3 p-3 rounded-lg border border-gray-200 hover:border-[#0056D2] hover:bg-[#F0F6FF]/40 cursor-pointer transition text-sm">
+                    <input type="radio" name="q_{{ q.id }}" value="{{ loop.index0 }}" required class="text-[#0056D2] focus:ring-[#0056D2]">
+                    <span class="font-mono text-gray-800">{{ opt }}</span>
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <div class="flex justify-end">
+            <button type="submit" class="px-6 py-3 rounded bg-[#0056D2] hover:bg-[#00419E] text-white font-bold text-sm transition shadow-sm">
+                <i class="fa-solid fa-paper-plane mr-2"></i>Chấm điểm & Xếp Lộ trình Học tập
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %}
