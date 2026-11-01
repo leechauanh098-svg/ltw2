@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Báo Cáo Dự Án: Nền Tảng Hỗ Trợ Người Mới Bắt Đầu Học Lập Trình Web</title>
+
+  <!-- Reveal.js Core CSS & Theme -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/theme/dracula.min.css" id="theme">
+
+  <!-- Code Syntax Highlighting Theme (Dracula / Monokai) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --primary: #6366f1;
+      --primary-light: #818cf8;
+      --secondary: #06b6d4;
+      --accent: #f59e0b;
+      --success: #10b981;
+      --danger: #ef4444;
+      --bg-card: rgba(30, 41, 59, 0.7);
+      --border-card: rgba(255, 255, 255, 0.1);
+    }
+
+    .reveal {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      color: #f1f5f9;
+    }
+
+    .reveal h1, .reveal h2, .reveal h3, .reveal h4 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      text-transform: none;
+    }
+
+    .reveal pre code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85em;
+      line-height: 1.45;
+      border-radius: 12px;
+      padding: 16px 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    /* Gradient Text */
+    .gradient-text {
+      background: linear-gradient(135deg, #38bdf8 0%, #818cf8 50%, #c084fc 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+
+    .gradient-text-gold {
+      background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      display: inline-block;
+    }
+
+    /* Cards & Glassmorphism */
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-top: 25px;
+    }
+
+    .card {
+      background: var(--bg-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-card);
+      border-radius: 16px;
+      padding: 22px 24px;
+      text-align: left;
+      transition: all 0.3s ease;
+    }
+
+    .card:hover {
+      border-color: var(--primary-light);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 24px -10px rgba(99, 102, 241, 0.3);
+    }
+
+    .card-icon {
+      font-size: 1.8rem;
+      margin-bottom: 12px;
+      display: inline-block;
+    }
+
+    .card h4 {
+      font-size: 1.15rem;
+      margin-bottom: 8px;
+      color: #fff;
+    }
+
+    .card p {
+      font-size: 0.85rem;
+      color: #94a3b8;
+      line-height: 1.5;
+      margin: 0;
+    }
+
+    /* Badges */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 16px;
+    }
+
+    .badge-primary {
+      background: rgba(99, 102, 241, 0.2);
+      color: #a5b4fc;
+      border: 1px solid rgba(99, 102, 241, 0.4);
+    }
+
+    .badge-success {
+      background: rgba(16, 185, 129, 0.2);
+      color: #6ee7b7;
+      border: 1px solid rgba(16, 185, 129, 0.4);
+    }
+
+    /* Comparison Table / Box */
+    .compare-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-top: 24px;
+      text-align: left;
+    }
+
+    .compare-box {
+      border-radius: 16px;
+      padding: 24px;
+    }
+
+    .box-problem {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.3);
+    }
+
+    .box-solution {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .compare-box ul {
+      list-style: none;
+      padding: 0;
+      margin: 14px 0 0 0;
+      font-size: 0.85rem;
+      line-height: 1.7;
+    }
+
+    .compare-box li {
+      margin-bottom: 10px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .compare-box li i {
+      margin-top: 4px;
+    }
+
+    /* Step Timeline */
+    .timeline {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-top: 30px;
+      text-align: left;
+    }
+
+    .timeline-step {
+      background: rgba(30, 41, 59, 0.8);
+      border-top: 3px solid var(--primary);
+      padding: 16px;
+      border-radius: 0 0 12px 12px;
+    }
+
+    .timeline-step .step-num {
+      font-weight: 800;
+      color: var(--primary-light);
+      font-size: 0.9rem;
+      margin-bottom: 6px;
+    }
+
+    .timeline-step h5 {
+      font-size: 0.95rem;
+      margin: 0 0 6px 0;
+      color: #fff;
+    }
+
+    .timeline-step p {
+      font-size: 0.78rem;
+      color: #94a3b8;
+      margin: 0;
+      line-height: 1.4;
+    }
+
+    /* Slide Navigation Hint */
+    .nav-hint {
+      position: fixed;
+      bottom: 16px;
+      left: 20px;
+      font-size: 0.72rem;
+      color: #64748b;
+      z-index: 1000;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="reveal">
+    <div class="slides">
+
+      <!-- SLIDE 1: TRANG BÌA -->
+      <section data-background-gradient="radial-gradient(circle at 50% 30%, #1e1b4b 0%, #0f172a 70%, #020617 100%)">
+        <div class="badge badge-primary">
+          <i class="fa-solid fa-graduation-cap"></i> Đồ án Lập trình Web • NEU WebPath
+        </div>
+        <h1 style="font-size: 2.5rem; margin-bottom: 16px;">
+          Nền Tảng Hỗ Trợ Người Mới Bắt Đầu<br>
+          <span class="gradient-text">Học Lập Trình Web</span>
+        </h1>
+        <p style="font-size: 1.15rem; color: #94a3b8; max-width: 800px; margin: 0 auto 30px auto; line-height: 1.6;">
+          Hệ sinh thái học tập tích hợp: <strong>Cây kỹ năng DAG</strong>, <strong>Chấm code tự động (Auto-Judge)</strong>, 
+          <strong>Trợ lý sư phạm AI</strong> & <strong>Bạn học cùng tiến (Buddy Learning)</strong>
+        </p>
+
+        <div style="display: flex; justify-content: center; gap: 30px; font-size: 0.9rem; color: #cbd5e1; margin-top: 40px;">
+          <div><i class="fa-solid fa-user-tie" style="color: #818cf8;"></i> <strong>Học phần:</strong> CNTT1165 & CNTT1188</div>
+          <div><i class="fa-solid fa-school" style="color: #38bdf8;"></i> <strong>Khoa:</strong> Công nghệ Thông tin - NEU</div>
+          <div><i class="fa-solid fa-code-branch" style="color: #34d399;"></i> <strong>Kiến trúc:</strong> Python Flask • Socket.IO • WSGI</div>
+        </div>
+      </section>
+
+      <!-- SLIDE 2: TỔNG QUAN VẤN ĐỀ & MỤC TIÊU -->
+      <section>
+        <div class="badge badge-primary">
+          <i class="fa-solid fa-magnifying-glass"></i> Thực trạng & Giải pháp
+        </div>
+        <h2 style="font-size: 2.1rem; margin-bottom: 10px;">Vấn Đề Của Người Mới Tự Học Web</h2>
+        <p style="font-size: 0.95rem; color: #94a3b8;">Học viên thường mất phương hướng và bỏ cuộc ở giai đoạn đầu do 3 nguyên nhân cốt lõi</p>
+
+        <div class="compare-container">
+          <div class="compare-box box-problem">
+            <h4 style="color: #f87171; margin-top: 0; font-size: 1.15rem;">
+              <i class="fa-solid fa-triangle-exclamation"></i> Rào cản hiện tại
+            </h4>
+            <ul>
+              <li>
+                <i class="fa-solid fa-circle-xmark" style="color: #f87171;"></i>
+                <span><strong>"Tutorial Hell":</strong> Xem video thụ động, không bắt tay tự gõ code và tự sửa lỗi cú pháp.</span>
+              </li>
+              <li>
+                <i class="fa-solid fa-circle-xmark" style="color: #f87171;"></i>
+                <span><strong>Thiếu phản hồi tức thời:</strong> Khi code lỗi không biết sai ở đâu, không có mentor giải đáp 24/7.</span>
+              </li>
+              <li>
+                <i class="fa-solid fa-circle-xmark" style="color: #f87171;"></i>
+                <span><strong>Lộ trình rời rạc:</strong> Học lẫn lộn kiến thức trước - sau, thiếu hệ thống điều kiện tiên quyết.</span>
+              </li>
+            </ul>
+          </div>
+
+          <div class="compare-box box-solution">
+            <h4 style="color: #34d399; margin-top: 0; font-size: 1.15rem;">
+              <i class="fa-solid fa-circle-check"></i> Giải pháp từ Hệ thống
+            </h4>
+            <ul>
+              <li>
+                <i class="fa-solid fa-check" style="color: #34d399;"></i>
+                <span><strong>Học lý thuyết song hành thực hành:</strong> Đọc bài giảng xong củng cố ngay bằng bài tập code tương tác.</span>
+              </li>
+              <li>
+                <i class="fa-solid fa-check" style="color: #34d399;"></i>
+                <span><strong>Auto-Judge + AI Tutor:</strong> Chấm testcase tự động (AC/WA/TLE) kèm giải thích lỗi sư phạm.</span>
+              </li>
+              <li>
+                <i class="fa-solid fa-check" style="color: #34d399;"></i>
+                <span><strong>Lộ trình Cây kỹ năng (DAG):</strong> Mở khóa tuần tự từng Node theo chuẩn đề cương đào tạo NEU.</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 3: MÔ HÌNH HỌC TẬP & CÂY KỸ NĂNG DAG -->
+      <section>
+        <div class="badge badge-success">
+          <i class="fa-solid fa-network-wired"></i> Mô hình sư phạm
+        </div>
+        <h2 style="font-size: 2.1rem; margin-bottom: 10px;">Lộ Trình Cây Kỹ Năng Đồ Thị (DAG)</h2>
+        <p style="font-size: 0.92rem; color: #94a3b8;">
+          Áp dụng Đồ thị có hướng không chu trình (Directed Acyclic Graph) để quản lý điều kiện tiên quyết của học phần
+        </p>
+
+        <div class="timeline">
+          <div class="timeline-step">
+            <div class="step-num">TIER 1 (NỀN TẢNG)</div>
+            <h5>HTML5 Semantic</h5>
+            <p>Cấu trúc trang web, thẻ ngữ nghĩa, bảng biểu và biểu mẫu chuẩn W3C.</p>
+          </div>
+          <div class="timeline-step">
+            <div class="step-num">TIER 2 (GIAO DIỆN)</div>
+            <h5>CSS3 & JavaScript</h5>
+            <p>Flexbox, Grid layout, Responsive design và tư duy lập trình JS ES6+ Client.</p>
+          </div>
+          <div class="timeline-step">
+            <div class="step-num">TIER 3 (TƯƠNG TÁC)</div>
+            <h5>DOM & Form Events</h5>
+            <p>Tương tác cây DOM, xử lý sự kiện và kiểm tra hợp lệ dữ liệu biểu mẫu Client-side.</p>
+          </div>
+          <div class="timeline-step">
+            <div class="step-num">TIER 4 (BACKEND)</div>
+            <h5>HTTP & Python Flask</h5>
+            <p>Kiến trúc Client-Server, Web APIs, Database ORM và triển khai dịch vụ Web Cloud.</p>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top: 25px; padding: 16px 20px; background: rgba(99, 102, 241, 0.1); border-color: rgba(99, 102, 241, 0.3);">
+          <div style="display: flex; align-items: center; gap: 15px;">
+            <i class="fa-solid fa-shield-halved" style="font-size: 1.5rem; color: #818cf8;"></i>
+            <div style="font-size: 0.88rem; color: #e2e8f0; text-align: left;">
+              <strong>Thuật toán kiểm soát DAG:</strong> Thuật toán <em>would_create_cycle()</em> ngăn ngừa các vòng lặp phụ thuộc kỹ năng, đồng thời tự động cập nhật trạng thái mở khóa cho học viên khi vượt qua bài tập tiên quyết.
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 4: KIẾN TRÚC HỆ THỐNG -->
+      <section>
+        <div class="badge badge-primary">
+          <i class="fa-solid fa-server"></i> Kiến trúc kỹ thuật
+        </div>
+        <h2 style="font-size: 2.1rem; margin-bottom: 10px;">Kiến Trúc Hệ Thống (Fullstack)</h2>
+        <p style="font-size: 0.92rem; color: #94a3b8;">Thiết kế mô-đun hóa cao (Modular Blueprints) phục vụ mở rộng và triển khai linh hoạt</p>
+
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-icon" style="color: #38bdf8;"><i class="fa-solid fa-layer-group"></i></div>
+            <h4>Frontend Layer</h4>
+            <p>Jinja2 Templates, TailwindCSS & Responsive CSS, Highlight.js, FontAwesome 6, Socket.IO Client cho thời gian thực.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon" style="color: #818cf8;"><i class="fa-brands fa-python"></i></div>
+            <h4>Flask Blueprints</h4>
+            <p>Phân tách 9 Blueprints: <code>auth</code>, <code>skills</code>, <code>judge</code>, <code>buddy</code>, <code>chat</code>, <code>m16</code>, <code>safety</code>, <code>ai</code>, <code>main</code>.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon" style="color: #34d399;"><i class="fa-solid fa-microchip"></i></div>
+            <h4>Auto-Judge Worker</h4>
+            <p>Hàng đợi tác vụ chấm bài qua <code>ThreadPoolExecutor</code>, chạy sandbox cô lập tiến trình và giới hạn tài nguyên CPU/RAM.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon" style="color: #fbbf24;"><i class="fa-solid fa-cloud-arrow-up"></i></div>
+            <h4>Database & Cloud</h4>
+            <p>SQLAlchemy ORM (SQLite / PostgreSQL), WSGI Gunicorn, tự động tạo schema & seed dữ liệu khi deploy lên Render Cloud.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 5: CƠ CHẾ AUTO-JUDGE & SANDBOX RUNNER -->
+      <section>
+        <div class="badge badge-primary">
+          <i class="fa-solid fa-terminal"></i> Lõi chấm mã tự động
+        </div>
+        <h2 style="font-size: 2.1rem; margin-bottom: 10px;">Auto-Judge & Sandbox Cô Lập</h2>
+        <p style="font-size: 0.92rem; color: #94a3b8;">Mỗi bài nộp được kiểm thử an toàn qua tiến trình con với Timeout & Memory Limit</p>
+
+        <pre><code class="language-python" data-trim data-noescape>
+def run_testcase_in_sandbox(language: str, source_code: str, stdin_data: str, 
+                            expected_output: str, time_limit_ms=1000) -> SandboxResult:
+    # 1. Tạo file mã nguồn tạm thời trong môi trường cô lập
+    # 2. Thực thi thông qua Subprocess với timeout nghiêm ngặt
+    try:
+        proc = subprocess.run([python_bin, temp_file], input=stdin_data, 
+                              capture_output=True, text=True, timeout=time_limit_ms / 1000)
+        # 3. Chuẩn hóa đầu ra và đối chiếu với đáp án chuẩn
+        if normalize_output(proc.stdout) == normalize_output(expected_output):
+            return SandboxResult(verdict="AC", memory_kb=mem_used, time_ms=elapsed)
+        return SandboxResult(verdict="WA", actual_output=proc.stdout)
+    except subprocess.TimeoutExpired:
+        return SandboxResult(verdict="TLE") # Xử lý quá thời gian quy định
+        </code></pre>
+
+        <div style="display: flex; justify-content: space-around; margin-top: 15px; font-size: 0.85rem; color: #cbd5e1;">
+          <div><i class="fa-solid fa-circle-check" style="color: #34d399;"></i> <strong>AC:</strong> Accepted</div>
+          <div><i class="fa-solid fa-circle-xmark" style="color: #f87171;"></i> <strong>WA:</strong> Wrong Answer</div>
+          <div><i class="fa-solid fa-clock" style="color: #fbbf24;"></i> <strong>TLE:</strong> Time Limit Exceeded</div>
+          <div><i class="fa-solid fa-robot" style="color: #a78bfa;"></i> <strong>AI Feedback:</strong> Gợi ý sư phạm tự động khi WA</div>
+        </div>
+      </section>
+
+      <!-- SLIDE 6: CÁC MODULE TÍNH NĂNG NỔI BẬT -->
+      <section>
+        <div class="badge badge-success">
+          <i class="fa-solid fa-cubes"></i> Bộ Tính Năng Đột Phá
+        </div>
+        <h2 style="font-size: 2.1rem; margin-bottom: 10px;">Hệ Thống Tính Năng Nổi Bật</h2>
+        <p style="font-size: 0.92rem; color: #94a3b8;">Tạo động lực học tập bền vững thông qua tương tác cộng đồng và trò chơi hóa</p>
+
+        <div class="card-grid">
+          <div class="card">
+            <div class="card-icon" style="color: #818cf8;"><i class="fa-solid fa-user-group"></i></div>
+            <h4>Bạn Học Cùng Tiến</h4>
+            <p>Ghép cặp bạn học thông minh theo trình độ và mục tiêu chung; tích hợp phòng chat tương tác thời gian thực qua WebSockets.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon" style="color: #fbbf24;"><i class="fa-solid fa-fire"></i></div>
+            <h4>Daily Streak & XP</h4>
+            <p>Hệ thống chuỗi ngày học tập liên tục (Streak), sổ cái ghi nhận điểm thưởng kinh nghiệm (XP Ledger) và chống gian lận thời gian.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon" style="color: #34d399;"><i class="fa-solid fa-medal"></i></div>
+            <h4>Huy Hiệu & Bảng Xếp Hạng</h4>
+            <p>Tự động trao huy hiệu theo cột mốc thành tựu (Sinh viên chăm chỉ, Bền bỉ 7 ngày,...); bảng vàng vinh danh xếp hạng theo tuần/tháng.</p>
+          </div>
+
+          <div class="card">
+            <div class="card-icon" style="color: #f43f5e;"><i class="fa-solid fa-shield-virus"></i></div>
+            <h4>Safety & Content Moderation</h4>
+            <p>Bộ lọc từ khóa tiêu cực tự động trong tin nhắn trao đổi, kèm cổng báo cáo vi phạm (Report) dành cho Quản trị viên xử lý.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 7: DEMO & CÁC VAI TRÒ NGƯỜI DÙNG -->
+      <section>
+        <div class="badge badge-primary">
+          <i class="fa-solid fa-laptop-code"></i> Kịch bản trải nghiệm
+        </div>
+        <h2 style="font-size: 2.1rem; margin-bottom: 10px;">Phân Quyền & Kịch Bản Demo</h2>
+        <p style="font-size: 0.92rem; color: #94a3b8;">Hệ thống hỗ trợ 4 phân quyền hoàn chỉnh tương ứng với từng tác vụ</p>
+
+        <div class="card-grid" style="grid-template-columns: repeat(2, 1fr);">
+          <div class="card">
+            <h4 style="color: #38bdf8;"><i class="fa-solid fa-user"></i> 1. Khách Vãng Lai (Guest)</h4>
+            <p>
+              • Khám phá Cây kỹ năng và danh mục bài học demo.<br>
+              • Thực hiện <strong>Test Đầu Vào (Placement Test)</strong> để phân tích năng lực và tự động xếp lộ trình phù hợp.
+            </p>
+          </div>
+
+          <div class="card">
+            <h4 style="color: #34d399;"><i class="fa-solid fa-user-graduate"></i> 2. Học Viên (Learner)</h4>
+            <p>
+              • Đọc bài giảng lý thuyết theo từng chương NEU.<br>
+              • Làm bài tập thực hành, nhận kết quả AC, tích lũy XP, kết nối Bạn học và mở khóa Node tiếp theo.
+            </p>
+          </div>
+
+          <div class="card">
+            <h4 style="color: #fbbf24;"><i class="fa-solid fa-chalkboard-user"></i> 3. Giảng Viên / Mentor</h4>
+            <p>
+              • Cổng Mentor Portal: Xem báo cáo tiến độ học tập của từng sinh viên.<br>
+              • Hỗ trợ giải đáp và định hướng học tập cá nhân hóa.
+            </p>
+          </div>
+
+          <div class="card">
+            <h4 style="color: #f43f5e;"><i class="fa-solid fa-user-shield"></i> 4. Quản Trị Viên (Admin)</h4>
+            <p>
+              • Quản lý ngân hàng câu hỏi test đầu vào và đề bài tập.<br>
+              • Giám sát trung tâm an toàn nội dung chat và xử lý báo cáo.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <!-- SLIDE 8: KẾT LUẬN & HƯỚNG PHÁT TRIỂN -->
+      <section data-background-gradient="radial-gradient(circle at 50% 50%, #1e1b4b 0%, #0f172a 70%, #020617 100%)">
+        <div class="badge badge-success">
+          <i class="fa-solid fa-flag-checkered"></i> Tổng kết
+        </div>
+        <h2 style="font-size: 2.3rem; margin-bottom: 16px;">Kết Luận & Hướng Mở Rộng</h2>
+        
+        <div class="card-grid" style="grid-template-columns: 1fr 1fr; margin-bottom: 30px;">
+          <div class="card" style="background: rgba(16, 185, 129, 0.08); border-color: rgba(16, 185, 129, 0.3);">
+            <h4 style="color: #34d399;"><i class="fa-solid fa-circle-check"></i> Kết Quả Đạt Được</h4>
+            <p style="color: #e2e8f0; font-size: 0.85rem; line-height: 1.6;">
+              ✓ Xây dựng hoàn chỉnh LMS chuyên biệt cho học viên mới bắt đầu.<br>
+              ✓ Lộ trình gắn chặt với 2 học phần CNTT1165 & CNTT1188 NEU.<br>
+              ✓ Trình chấm mã thời gian thực mượt mà kèm gợi ý AI sư phạm.<br>
+              ✓ Đã triển khai Production ổn định trên Cloud Render.
+            </p>
+          </div>
+
+          <div class="card" style="background: rgba(99, 102, 241, 0.08); border-color: rgba(99, 102, 241, 0.3);">
+            <h4 style="color: #818cf8;"><i class="fa-solid fa-rocket"></i> Hướng Phát Triển Tiếp Theo</h4>
+            <p style="color: #e2e8f0; font-size: 0.85rem; line-height: 1.6;">
+              🚀 Đóng gói Sandbox Runner vào Docker Container cô lập đa máy chủ.<br>
+              🚀 Mở rộng bài tập sang các Framework hiện đại: React, Node.js.<br>
+              🚀 Tích hợp LLM đa phương thức (Vision AI) để tự động chấm bài giao diện UI/UX trực quan.
+            </p>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px;">
+          <h3 class="gradient-text-gold" style="font-size: 1.6rem; margin-bottom: 8px;">Xin Chân Thành Cảm Ơn!</h3>
+          <p style="font-size: 0.95rem; color: #94a3b8; margin: 0;">Sẵn sàng lắng nghe câu hỏi và góp ý từ Quý Thầy Cô & Hội đồng</p>
+        </div>
+      </section>
+
+    </div>
+  </div>
+
+  <div class="nav-hint">
+    <i class="fa-solid fa-keyboard"></i> Phím tắt: <strong>Space / Mũi tên</strong> (Chuyển slide) • <strong>F</strong> (Toàn màn hình) • <strong>O</strong> (Tổng quan)
+  </div>
+
+  <!-- Reveal.js & Plugins via CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/reveal.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/5.1.0/plugin/highlight/highlight.min.js"></script>
+
+  <script>
+    Reveal.initialize({
+      hash: true,
+      slideNumber: 'c/t',
+      controls: true,
+      progress: true,
+      center: true,
+      transition: 'slide', // none/fade/slide/convex/concave/zoom
+      plugins: [ RevealHighlight ]
+    });
+  </script>
+</body>
+</html>

@@ -26,10 +26,11 @@ init_db_and_seed()
 
 if __name__ == "__main__":
     print("\n" + "=" * 75)
-    print("🚀 WEBSITE HỌC LẬP TRÌNH WEB THEO LỘ TRÌNH NEU (TÍCH HỢP M10 + M12 + M16)")
+    print("🚀 WEBSITE HỌC LẬP TRÌNH WEB THEO LỘ TRÌNH NEU")
     print("👉 Truy cập ngay tại: http://127.0.0.1:5000")
+    print("📊 Xem Slide thuyết trình: http://127.0.0.1:5000/slides")
     print("👤 Vai trò 1 - Khách (Guest): Xem giới thiệu, Cây kỹ năng mẫu, Test đầu vào")
-    print("🎓 Vai trò 2 - Người học:     hocvien / 123456 (Bạn học: minh_anh_k65 / 123456)")
+    print("🎓 Vai trò 2 - Người học:     hocvien / 123456")
     print("👨‍🏫 Vai trò 3 - Mentor / GV:   mentor  / 123456")
     print("🛡️  Vai trò 4 - Quản trị viên: admin   / 123456")
     print("=" * 75 + "\n")

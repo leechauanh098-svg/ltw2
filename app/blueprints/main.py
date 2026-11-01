@@ -47,6 +47,12 @@ def landing():
     )
 
 
+@main_bp.route("/slides")
+def presentation_slides():
+    """Trình chiếu slide thuyết trình dự án bằng Reveal.js."""
+    return render_template("slides.html")
+
+
 @main_bp.route("/placement-test", methods=["GET", "POST"])
 def placement_test():
     """

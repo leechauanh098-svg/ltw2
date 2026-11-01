@@ -8,20 +8,20 @@
         <div class="mb-8 p-6 rounded-lg bg-[#F0F6FF] border border-blue-200 flex flex-col lg:flex-row items-center justify-between gap-6">
             <div>
                 <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-bold uppercase bg-[#0056D2] text-white mb-2">
-                    Đăng nhập Nhanh 1-Click (Demo Đầy Đủ Các Vai Trò)
+                    Đăng nhập Nhanh 1-Click
                 </span>
                 <h1 class="text-2xl font-bold text-[#1F1F1F]">Website Học Lập Trình Web Theo Lộ Trình Cho Người Mới Bắt Đầu</h1>
-                <p class="text-sm text-gray-600 mt-1">Chọn ngay 1 trong 3 vai trò dưới đây để kiểm thử toàn bộ chức năng của Module M10 – LMS/LCMS:</p>
+                <p class="text-sm text-gray-600 mt-1">Chọn vai trò dưới đây để đăng nhập nhanh vào hệ thống:</p>
             </div>
             <div class="flex flex-wrap items-center gap-2.5 shrink-0">
                 <a href="{{ url_for('auth.quick_login', role='learner') }}" class="px-4 py-2.5 rounded bg-[#0056D2] hover:bg-[#00419E] text-white font-bold text-xs transition shadow-sm">
-                    <i class="fa-solid fa-user-graduate mr-1.5"></i>1. Người học (hocvien)
+                    <i class="fa-solid fa-user-graduate mr-1.5"></i>1. Người học
                 </a>
                 <a href="{{ url_for('auth.quick_login', role='instructor') }}" class="px-4 py-2.5 rounded bg-[#0E8043] hover:bg-emerald-800 text-white font-bold text-xs transition shadow-sm">
-                    <i class="fa-solid fa-chalkboard-user mr-1.5"></i>2. Mentor / GV (mentor)
+                    <i class="fa-solid fa-chalkboard-user mr-1.5"></i>2. Mentor / GV
                 </a>
                 <a href="{{ url_for('auth.quick_login', role='admin') }}" class="px-4 py-2.5 rounded bg-white hover:bg-gray-50 text-[#0056D2] border border-[#0056D2] font-bold text-xs transition">
-                    <i class="fa-solid fa-user-shield mr-1.5"></i>3. Quản trị viên (admin)
+                    <i class="fa-solid fa-user-shield mr-1.5"></i>3. Quản trị viên
                 </a>
             </div>
         </div>
@@ -31,7 +31,7 @@
             <div class="bg-white border border-gray-200 rounded-lg p-8 shadow-sm">
                 <h2 class="text-2xl font-bold text-[#1F1F1F]">Đăng nhập Tài khoản</h2>
                 <p class="text-xs text-gray-500 mt-1 mb-6">
-                    Tài khoản mẫu: <code class="font-bold text-[#0056D2]">hocvien</code>, <code class="font-bold text-[#0E8043]">mentor</code>, hoặc <code class="font-bold text-indigo-700">admin</code> (Mật khẩu chung: <code class="font-bold">123456</code>)
+                    Tài khoản: <code class="font-bold text-[#0056D2]">hocvien</code>, <code class="font-bold text-[#0E8043]">mentor</code>, hoặc <code class="font-bold text-indigo-700">admin</code> (Mật khẩu: <code class="font-bold">123456</code>)
                 </p>
 
                 <form method="POST" action="{{ url_for('auth.login') }}" class="space-y-4">

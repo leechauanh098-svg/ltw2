@@ -7,7 +7,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 grid lg:grid-cols-12 gap-8 items-center">
         <div class="lg:col-span-7 space-y-5">
             <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-bold uppercase bg-[#F0F6FF] text-[#0056D2] border border-blue-200">
-                <i class="fa-solid fa-graduation-cap mr-1.5"></i>Bài tập lớn Môn Lập trình Web • Module M10 (LMS/LCMS)
+                <i class="fa-solid fa-graduation-cap mr-1.5"></i>Nền tảng Học Lập trình Web Chuẩn Lộ trình
             </span>
             <h1 class="text-3xl sm:text-4xl font-extrabold text-[#1F1F1F] leading-tight">
                 Học Lập Trình Web Theo Lộ Trình Rõ Ràng – Không Còn Sợ "Trang Giấy Trắng"
@@ -29,17 +29,17 @@
             </div>
         </div>
 
-        <!-- Right Card: 4 Vai trò trong Hệ thống (Quick Demo Login) -->
+        <!-- Right Card: Các Vai trò trong Hệ thống -->
         <div class="lg:col-span-5 bg-[#F5F7F8] border border-gray-200 rounded-xl p-6 space-y-4 shadow-sm">
             <h2 class="text-base font-extrabold text-[#1F1F1F] flex items-center">
-                <i class="fa-solid fa-users-gear text-[#0056D2] mr-2"></i>Trải nghiệm Ngay theo 4 Vai trò (Module M10)
+                <i class="fa-solid fa-users-gear text-[#0056D2] mr-2"></i>Trải nghiệm Ngay theo các Vai trò
             </h2>
-            <p class="text-xs text-gray-600">Bạn đang ở vai trò <strong>Khách (Guest)</strong>. Bấm vào các nút dưới đây để chuyển nhanh sang các vai trò khác:</p>
+            <p class="text-xs text-gray-600">Bấm vào các vai trò dưới đây để bắt đầu trải nghiệm:</p>
 
             <div class="space-y-2.5 text-xs">
                 <a href="{{ url_for('auth.quick_login', role='learner') }}" class="block p-3.5 rounded-lg bg-white border border-gray-200 hover:border-[#0056D2] transition flex items-center justify-between">
                     <div>
-                        <span class="font-bold text-[#0056D2] block">1. Vai trò Người học (hocvien)</span>
+                        <span class="font-bold text-[#0056D2] block">1. Vai trò Người học</span>
                         <span class="text-gray-500">Học theo cây kỹ năng, làm bài tập khung code, nhận XP & Huy hiệu, tìm bạn cùng học.</span>
                     </div>
                     <i class="fa-solid fa-arrow-right text-[#0056D2] ml-2"></i>
@@ -47,7 +47,7 @@
 
                 <a href="{{ url_for('auth.quick_login', role='instructor') }}" class="block p-3.5 rounded-lg bg-white border border-gray-200 hover:border-[#0056D2] transition flex items-center justify-between">
                     <div>
-                        <span class="font-bold text-[#0E8043] block">2. Vai trò Mentor / Giảng viên (mentor)</span>
+                        <span class="font-bold text-[#0E8043] block">2. Vai trò Mentor / Giảng viên</span>
                         <span class="text-gray-500">Tạo node lộ trình, theo dõi tiến độ và viết nhận xét bài làm của người học.</span>
                     </div>
                     <i class="fa-solid fa-arrow-right text-[#0E8043] ml-2"></i>
@@ -55,7 +55,7 @@
 
                 <a href="{{ url_for('auth.quick_login', role='admin') }}" class="block p-3.5 rounded-lg bg-white border border-gray-200 hover:border-[#0056D2] transition flex items-center justify-between">
                     <div>
-                        <span class="font-bold text-indigo-700 block">3. Vai trò Quản trị viên (admin)</span>
+                        <span class="font-bold text-indigo-700 block">3. Vai trò Quản trị viên</span>
                         <span class="text-gray-500">Quản lý tài khoản, phân quyền RBAC, quản lý ngân hàng câu hỏi & duyệt nội dung.</span>
                     </div>
                     <i class="fa-solid fa-arrow-right text-indigo-700 ml-2"></i>

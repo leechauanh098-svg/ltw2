@@ -165,28 +165,28 @@
                     <i class="fa-solid fa-clipboard-question w-6"></i>Bài Test Đầu vào Xếp Lộ trình
                 </a>
                 <a href="{{ url_for('m16.index') }}" class="block px-3.5 py-2.5 rounded-lg text-sm font-bold {% if request.blueprint == 'm16' and request.endpoint != 'm16.leaderboard' %}bg-[#F0F6FF] text-[#0056D2]{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
-                    <i class="fa-solid fa-medal w-6 text-amber-500"></i>Thành tích, Streak & Huy hiệu (M16)
+                    <i class="fa-solid fa-medal w-6 text-amber-500"></i>Thành tích, Streak & Huy hiệu
                 </a>
                 <a href="{{ url_for('m16.leaderboard') }}" class="block px-3.5 py-2.5 rounded-lg text-sm font-bold {% if request.endpoint == 'm16.leaderboard' %}bg-[#F0F6FF] text-[#0056D2]{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
-                    <i class="fa-solid fa-trophy w-6 text-amber-500"></i>Bảng Xếp Hạng Học Viên (M16)
+                    <i class="fa-solid fa-trophy w-6 text-amber-500"></i>Bảng Xếp Hạng Học Viên
                 </a>
                 <a href="{{ url_for('buddy.index') }}" class="block px-3.5 py-2.5 rounded-lg text-sm font-bold {% if request.blueprint == 'buddy' %}bg-[#F0F6FF] text-[#0056D2]{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
-                    <i class="fa-solid fa-user-group w-6 text-[#0056D2]"></i>Tìm Bạn Học Cùng Lộ Trình (M12)
+                    <i class="fa-solid fa-user-group w-6 text-[#0056D2]"></i>Tìm Bạn Học Cùng Lộ Trình
                 </a>
                 <a href="{{ url_for('chat.index') }}" class="block px-3.5 py-2.5 rounded-lg text-sm font-bold {% if request.blueprint == 'chat' %}bg-[#F0F6FF] text-[#0056D2]{% else %}text-gray-700 hover:bg-gray-50{% endif %}">
-                    <i class="fa-solid fa-comments w-6 text-[#0056D2]"></i>Phòng Chat & Trợ lý AI (M12)
+                    <i class="fa-solid fa-comments w-6 text-[#0056D2]"></i>Phòng Chat & Trợ lý AI
                 </a>
                 {% if current_user.is_admin_or_instructor %}
                 <a href="{{ url_for('main.mentor_portal') }}" class="block px-3.5 py-2.5 rounded-lg text-sm font-bold text-indigo-700 bg-indigo-50/60">
-                    <i class="fa-solid fa-chalkboard-user w-6"></i>Cổng Mentor & Quản trị viên (M10)
+                    <i class="fa-solid fa-chalkboard-user w-6"></i>Cổng Mentor & Quản trị viên
                 </a>
                 {% endif %}
                 {% if current_user.role == 'admin' %}
                 <a href="{{ url_for('m16.admin_questions') }}" class="block px-3.5 py-2.5 rounded-lg text-sm font-bold text-indigo-700 bg-indigo-50/60">
-                    <i class="fa-solid fa-database w-6"></i>Quản lý Ngân hàng Câu hỏi (M16)
+                    <i class="fa-solid fa-database w-6"></i>Quản lý Ngân hàng Câu hỏi
                 </a>
                 <a href="{{ url_for('safety.admin_reports') }}" class="block px-3.5 py-2.5 rounded-lg text-sm font-bold text-red-700 bg-red-50/60">
-                    <i class="fa-solid fa-shield-halved w-6"></i>Xử lý Báo cáo Vi phạm (M12)
+                    <i class="fa-solid fa-shield-halved w-6"></i>Xử lý Báo cáo Vi phạm
                 </a>
                 {% endif %}
             {% else %}
@@ -234,7 +234,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-500 gap-3 text-center sm:text-left">
             <div class="flex flex-col sm:flex-row items-center gap-2.5">
                 <img src="{{ url_for('static', filename='images/neu_logo.jpg') }}" alt="NEU Logo" class="w-7 h-7 rounded-full object-contain bg-white">
-                <span><strong class="text-[#1F1F1F]">Trường Đại học Kinh tế Quốc dân (NEU)</strong> • Bài tập lớn Môn Lập trình Web (Module M10 – LMS/LCMS)</span>
+                <span><strong class="text-[#1F1F1F]">Trường Đại học Kinh tế Quốc dân (NEU)</strong> • Hệ thống Hỗ Trợ Học Lập Trình Web</span>
             </div>
             <div>
                 <span>Tương thích chuẩn Responsive: Điện thoại • iPad • Laptop</span>
